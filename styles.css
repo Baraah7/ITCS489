@@ -1,8 +1,11 @@
 header{
-    background-color: #333;
+    background-color: #333333;
     color: white;
     padding: 10px;
     text-align: center;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
 }
 
 body {
@@ -15,6 +18,7 @@ body {
 
 main{
     padding: 2rem;
+    margin-left: 100px;
 }
 
 h1{
@@ -29,13 +33,15 @@ div label{
 }
 
 .Sidebar{
+    position: fixed;
     background-color: #DFD3C3;
     padding: 15px;
     width: 100px;
     float: left;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100dvh;
+    z-index: 1001;
 }
 
 .side-icon {
@@ -116,22 +122,22 @@ tbody tr:hover {
     flex-direction: column;
     margin: 0 20px;
     padding: 20px;
-    background-color: #F7F7F7;
 }
 
 form div label{
     font-weight: 600;
     font-size: 1.2rem;
     margin: 5px;
-    color: brown;
 }
 
 .form-button{
-    color: white;
+    color: rgb(0, 0, 0);
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    border: #111827 1px solid;
+    background-color: #e5e7eb;
 }
 
 @media (max-width: 600px) {
@@ -139,6 +145,7 @@ form div label{
     main{
         padding-left: 0rem;
         padding-right: 0rem;
+        margin-left: 50px;
     }
 
     .Sidebar{
