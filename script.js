@@ -1,13 +1,14 @@
 let home = document.querySelector(".SideButton#home");
-let homeContent = document.getElementsByClassName("home-content");
+let homeContent = document.querySelector(".Home-content");
 
-let showHome = home.addEventListener(onclick);
+home.addEventListener("click", showHome);
 
 function showHome() {
     console.log("Home button clicked");
-  if (homeContent.style.display === "none") {
-        homeContent.style.display = "flex";
-    } else {
-        homeContent.style.display = "none";
+
+    if (homeContent) {
+        const currentDisplay = getComputedStyle(homeContent).display;
+
+        homeContent.style.display = (currentDisplay === "none") ? "flex" : "none";
     }
 }
