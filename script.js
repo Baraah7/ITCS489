@@ -39,3 +39,15 @@ function showRemove() {
     AddContent.style.display = "none";
     RemoveContent.style.display = "flex";
 }
+
+let editbutton = document.getElementById("find-edit");
+let removebutton = document.querySelector("#find-delete");    
+let inputfrom = document.querySelector("#input-form");
+let editform = document.querySelector("#edit-form");
+
+editbutton.addEventListener("click", findbook);
+removebutton.addEventListener("click", findbook);
+
+function findbook() {
+    editform.style.display = "flex";
+}

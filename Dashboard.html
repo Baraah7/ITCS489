@@ -75,8 +75,19 @@
         </div>
 
         <div class="Edit-content">
-            <label>Edit bood information:</label> <br>
-            <form class="form-container">
+            <form id="input-form" class="form-container">
+                <div class="form-group">
+                    <label for="find">Title or ISBN</label>
+                    <input type="text" id="find" placeholder="Enter book title ISBN to delete">
+                </div>
+                
+                <div class="form-group">
+                    <button id="find-edit" class="form-button">Show</button>
+                    <button type="reset" class="form-button">Cancel</button>
+                </div>
+            </form>
+            <form class="form-container" id="edit-form">
+                <label>Edit bood information:</label> <br>
                 <div class="form-group">
                     <label for="title">Title</label>
                     <input type="text" id="title" placeholder="Enter book title">
@@ -144,7 +155,17 @@
             </form>
         </div>
         <div class="Delete-content">
-            delete
+            <form class="form-container">
+                <div class="form-group">
+                    <label for="find">Title or ISBN</label>
+                    <input type="text" id="find" placeholder="Enter book title ISBN to delete">
+                </div>
+                
+                <div class="form-group">
+                    <button id="find-delete" class="form-button">Delete</button>
+                    <button type="reset" class="form-button">Cancel</button>
+                </div>
+            </form>
         </div>
     </main>
 
