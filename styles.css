@@ -37,3 +37,8 @@ header{
     margin: 20px 0;
     font-size: 24px;
 }
+
+table{
+    width: 60%;
+    border-collapse: collapse;
+}
