@@ -13,6 +13,14 @@ h1 {
     margin-right: auto;
 }
 
+.subtitle {
+    font-size: 1rem;
+    color: #6B778C;
+    font-weight: normal;
+    margin-top: 0.25rem;
+    line-height: 1.4;
+}
+
 .header-top h1 {
     font-size: 3rem; /* Make the title bigger */
     font-weight: bold; /* Make the title bolder */
