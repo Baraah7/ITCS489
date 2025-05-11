@@ -15,7 +15,25 @@ header{
     height: 100vh;
 }
 
+.side-icon {
+    width: 50%; /* Adjusts to 50% of the container's width */
+    height: auto; /* Maintains aspect ratio */
+    max-width: 100%; /* Ensures it doesn't exceed the container's width */
+    margin: 10px auto; /* Centers the icon */
+    padding: 3px;
+}
+
+.Sidebar p{
+    text-align: center;
+    margin: 30px 0;
+    color: black;
+}
+
 .Home-content{
     background-color: #F7F7F7;
-    padding: 20px;
+}
+
+.table-name{
+    margin: 20px 0;
+    font-size: 24px;
 }
