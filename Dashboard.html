@@ -34,16 +34,16 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Product 1</td>
-                        <td>$10.00</td>
-                        <td>100</td>
-                        <td>$1000.00</td>
+                        <td data-label="Product">Product 1</td>
+                        <td data-label="Price">$10.00</td>
+                        <td data-label="Sales">100</td>
+                        <td data-label="Revenue">$1000.00</td>
                     </tr>
                     <tr>
-                        <td>Product 2</td>
-                        <td>$20.00</td>
-                        <td>50</td>
-                        <td>$1000.00</td>
+                        <td data-label="Product">Product 2</td>
+                        <td data-label="Price">$20.00</td>
+                        <td data-label="Sales">50</td>
+                        <td data-label="Revenue">$1000.00</td>
                     </tr>
                 </tbody>
             </table>
@@ -59,26 +59,89 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>1001</td>
-                        <td>John Doe</td>
-                        <td>$50.00</td>
-                        <td>Shipped</td>
+                        <td data-label="Order ID">1001</td>
+                        <td data-label="Customer">John Doe</td>
+                        <td data-label="Total">$50.00</td>
+                        <td data-label="Status">Shipped</td>
                     </tr>
                     <tr>
-                        <td>1002</td>
-                        <td>Jane Smith</td>
-                        <td>$75.00</td>
-                        <td>Processing</td>
+                        <td data-label="Order ID">1002</td>
+                        <td data-label="Customer">Jane Smith</td>
+                        <td data-label="Total">$75.00</td>
+                        <td data-label="Status">Shipped>Processing</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <div class="Edit-content">
-            edit
+            <label>Edit bood information:</label> <br>
+            <form class="form-container">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" placeholder="Enter book title">
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input type="text" id="author" placeholder="Enter author's name">
+                </div>
+
+                <div class="form-group">
+                    <label for="isbn">ISBN</label>
+                    <input type="text" id="isbn" placeholder="Enter ISBN number">
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="number" id="price" placeholder="Enter price" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label for="stock">Stock</label>
+                    <input type="number" id="stock" placeholder="Enter stock quantity">
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="form-button">Submit</button>
+                    <button type="reset" class="form-button">Cancel</button>
+                </div>
+            </form>
         </div>
+
         <div class="Add-content">
-            add
+            <label>Add new book:</label> <br>
+            <form class="form-container">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" placeholder="Enter book title">
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input type="text" id="author" placeholder="Enter author's name">
+                </div>
+
+                <div class="form-group">
+                    <label for="isbn">ISBN</label>
+                    <input type="text" id="isbn" placeholder="Enter ISBN number">
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="number" id="price" placeholder="Enter price" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label for="stock">Stock</label>
+                    <input type="number" id="stock" placeholder="Enter stock quantity">
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="form-button">Submit</button>
+                    <button type="reset" class="form-button">Cancel</button>
+                </div>
+            </form>
         </div>
         <div class="Delete-content">
             delete

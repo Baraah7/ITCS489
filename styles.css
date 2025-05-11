@@ -5,8 +5,27 @@ header{
     text-align: center;
 }
 
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9fafb;
+    color: #111827;
+}
+
+main{
+    padding: 2rem;
+}
+
 h1{
     font-style: italic;
+}
+
+div label{
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin: 2rem 0 0.5rem;
+    color: #374151;
 }
 
 .Sidebar{
@@ -45,29 +64,83 @@ main div{
     flex-direction: column;
 }
 
-.table-name{
-    margin: 20px 0;
-    font-size: 24px;
+.table-name {
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin: 2rem 0 0.5rem;
+    color: #374151;
 }
 
-table{
-    width: 60%;
+table {
+    width: 100%;
     border-collapse: collapse;
+    margin-top: 0.5rem;
+}
+
+thead {
+    background-color: #e5e7eb;
+}
+
+th, td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #d1d5db;
+}
+
+th {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+tbody tr:hover {
+    background-color: #f3f4f6;
 }
 
 .Edit-content{
     display: none;
+    flex-direction: column;
 }
 
 .Add-content{
     display: none;
+    flex-direction: column;
 }
 
 .Delete-content{
     display: none;
+    flex-direction: column;
+}
+
+.form-container{
+    display: flex;
+    flex-direction: column;
+    margin: 0 20px;
+    padding: 20px;
+    background-color: #F7F7F7;
+}
+
+form div label{
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin: 5px;
+    color: brown;
+}
+
+.form-button{
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 @media (max-width: 600px) {
+
+    main{
+        padding-left: 0rem;
+        padding-right: 0rem;
+    }
+
     .Sidebar{
         width: 50px;
         padding: 0px;
@@ -89,5 +162,30 @@ table{
     margin: 5px auto;
     padding: 5px;
     margin-right: 10px;
+    }
+
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    thead {
+        display: none;
+    }
+
+    td {
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+    }
+
+    td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 1rem;
+        top: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        color: #6b7280;
     }
 }
