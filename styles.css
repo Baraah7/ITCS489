@@ -45,6 +45,14 @@ table{
     border-collapse: collapse;
 }
 
-.Sidebar button{
-    background-color: white;
+.Edit-content{
+    display: none;
+}
+
+.Add-content{
+    display: none;
+}
+
+.Delete-content{
+    display: none;
 }
