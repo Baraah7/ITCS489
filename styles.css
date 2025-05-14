@@ -132,6 +132,7 @@ form div label{
 
 #edit-form{
     display: none;
+    flex-direction: column;
 }
 
 .form-button{
@@ -143,6 +144,11 @@ form div label{
     border: #111827 1px solid;
     background-color: #e5e7eb;
     width: 100px;
+}
+
+#find-edit{
+    display: flex;
+    flex-direction: column;
 }
 
 @media (max-width: 600px) {
