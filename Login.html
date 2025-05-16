@@ -8,14 +8,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body>
-
         <main>
-            <form class="Page">
-                <input type="text" id="username" placeholder="Username" required>
-                <input type="password" id="password" placeholder="Password" required>
-            </form>
+            <div class="page">
+                <p class="title">Bagdad library</p>
+                <label class="label" for="username">Username</label>
+                <input class="input" type="text" id="username" placeholder="Username" required>
+                <label class="label" for="password">Password</label>
+                <input class="input" type="password" id="password" placeholder="Password" required>
+                <button class="button" id="loginButton">Login</button>
+                <p class="error" id="errorMessage"></p>
+            </div>
         </main>
-
         <script src="script.js"></script>
     </body>
 </html>
