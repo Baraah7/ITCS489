@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baghdad Library</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/mainPage.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Arial:wght@400;500;700&display=swap');
         
@@ -62,6 +63,13 @@
         <main>
             <!-- SPACE AFTER HEADER -->
             <div class="header-spacing h-10"></div>
+
+            <!-- WELCOME SECTION - Only visible when logged in -->
+            <section id="welcomeSection" class="welcome-section py-8 hidden">
+                <div class="container mx-auto px-8">
+                    <h2 class="text-2xl font-bold text-[#2A3F5F]">Welcome, <span id="userName">User</span>!</h2>
+                </div>
+            </section>
 
             <!-- NEW ARRIVALS SECTION -->            <section class="new-arrivals py-12">
                 <h2 class="section-title text-3xl font-bold text-[#2A3F5F] mb-8 text-center">New Arrivals</h2>
