@@ -1,4 +1,4 @@
-<?php include '../app/views/layout/header.php'; ?>
+<?php include __DIR__ . '/layout/header.php'; ?>
     <div class="max-w-screen-xl mx-auto w-full px-4">
         <!-- Header (same as other pages) -->
         <header style="background-color: #FFF9F4" class="shadow-md">
@@ -141,7 +141,7 @@
         </main>
 
         <!-- Footer (same as other pages) -->
-        <?php include '../app/views/layout/footer.php'; ?>    <!-- JavaScript -->
+        <?php include __DIR__ . '/layout/footer.php'; ?>    <!-- JavaScript -->
     <script src="../../public/js/help.js"></script>
 </body>
 </html>
