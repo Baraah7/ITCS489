@@ -203,8 +203,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // Note: Book IDs (1-8) are used to identify each book. These IDs can be modified later as needed
+        // when connecting to a database or different data source
         resultsContainer.innerHTML = paginatedBooks.map(book => `
-            <div class="rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow" style="background-color: #D0B8A8">
+            <div class="rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer book-card" 
+                 style="background-color: #D0B8A8"
+                 data-id="${book.id}">
                 <div class="relative pb-48 overflow-hidden">
                     <img src="${book.cover}" alt="${book.title}" class="absolute inset-0 w-full h-full object-contain p-4">
                 </div>
@@ -220,7 +224,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p class="text-gray-700 text-sm mb-3 line-clamp-2">${book.description}</p>
                     <div class="flex justify-between items-center">
                         <span class="font-bold text-lg">$${book.price.toFixed(2)}</span>
-                        <button class="add-to-cart text-white px-3 py-1 rounded-md text-sm" style="background-color: #2A3F5F; hover:opacity-90" data-id="${book.id}">
+                        <button class="add-to-cart text-white px-3 py-1 rounded-md text-sm" 
+                                style="background-color: #2A3F5F; hover:opacity-90" 
+                                data-id="${book.id}">
                             Add to Cart
                         </button>
                     </div>
@@ -337,12 +343,23 @@ document.addEventListener('DOMContentLoaded', function() {
         displayBooks(filteredBooks);
     });
 
-    // Event delegation for add to cart buttons
+    // Event delegation for book cards and add to cart buttons
     resultsContainer.addEventListener('click', function(e) {
+        // Handle add to cart button clicks
         if (e.target.classList.contains('add-to-cart') || e.target.closest('.add-to-cart')) {
+            e.preventDefault();
+            e.stopPropagation();
             const button = e.target.classList.contains('add-to-cart') ? e.target : e.target.closest('.add-to-cart');
             const bookId = parseInt(button.getAttribute('data-id'));
             addToCart(bookId);
+            return;
+        }
+
+        // Handle book card clicks for navigation
+        const bookCard = e.target.closest('.book-card');
+        if (bookCard) {
+            const bookId = bookCard.getAttribute('data-id');
+            window.location.href = `book_details.php?id=${bookId}`;
         }
     });
 
