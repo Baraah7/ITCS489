@@ -26,24 +26,24 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Total</th>
-                        <th>Status</th>
+                        <th>Book ISBN</th>
+                        <th>Title</th>
+                        <th>Quantity</th>
+                        <th>Profit</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td data-label="Order ID">1001</td>
-                        <td data-label="Customer">John Doe</td>
-                        <td data-label="Total">$50.00</td>
-                        <td data-label="Status">Shipped</td>
+                        <td data-label="Book ISBN">1001</td>
+                        <td data-label="Title">John Doe</td>
+                        <td data-label="Quantity">$50.00</td>
+                        <td data-label="Profit">Shipped</td>
                     </tr>
                     <tr>
-                        <td data-label="Order ID">1002</td>
-                        <td data-label="Customer">Jane Smith</td>
-                        <td data-label="Total">$75.00</td>
-                        <td data-label="Status">Processing</td>
+                        <td data-label="Book ISBN">1002</td>
+                        <td data-label="Title">Jane Smith</td>
+                        <td data-label="Quantity">$75.00</td>
+                        <td data-label="Profit">Processing</td>
                     </tr>
                 </tbody>
             </table>
@@ -64,27 +64,27 @@
                 <label>Edit bood information:</label> <br>
                 <div class="form-group">
                     <label for="title">Title</label>
-                    <input type="text" id="title" placeholder="Enter book title">
+                    <input type="text" id="edit-title" placeholder="Enter book title">
                 </div>
 
                 <div class="form-group">
                     <label for="author">Author</label>
-                    <input type="text" id="author" placeholder="Enter author's name">
+                    <input type="text" id="edit-author" placeholder="Enter author's name">
                 </div>
 
                 <div class="form-group">
                     <label for="isbn">ISBN</label>
-                    <input type="text" id="isbn" placeholder="Enter ISBN number">
+                    <input type="text" id="edit-isbn" placeholder="Enter ISBN number">
                 </div>
 
                 <div class="form-group">
                     <label for="price">Price</label>
-                    <input type="number" id="price" placeholder="Enter price" step="0.01">
+                    <input type="number" id="edit-price" placeholder="Enter price" step="0.01">
                 </div>
 
                 <div class="form-group">
                     <label for="stock">Stock</label>
-                    <input type="number" id="stock" placeholder="Enter stock quantity">
+                    <input type="number" id="edit-stock" placeholder="Enter stock quantity">
                 </div>
 
                 <div class="form-group">
@@ -99,27 +99,27 @@
             <form class="form-container">
                 <div class="form-group">
                     <label for="title">Title</label>
-                    <input type="text" id="title" placeholder="Enter book title">
+                    <input type="text" id="add-title" placeholder="Enter book title">
                 </div>
 
                 <div class="form-group">
                     <label for="author">Author</label>
-                    <input type="text" id="author" placeholder="Enter author's name">
+                    <input type="text" id="add-author" placeholder="Enter author's name">
                 </div>
 
                 <div class="form-group">
                     <label for="isbn">ISBN</label>
-                    <input type="text" id="isbn" placeholder="Enter ISBN number">
+                    <input type="text" id="add-isbn" placeholder="Enter ISBN number">
                 </div>
 
                 <div class="form-group">
                     <label for="price">Price</label>
-                    <input type="number" id="price" placeholder="Enter price" step="0.01">
+                    <input type="number" id="add-price" placeholder="Enter price" step="0.01">
                 </div>
 
                 <div class="form-group">
                     <label for="stock">Stock</label>
-                    <input type="number" id="stock" placeholder="Enter stock quantity">
+                    <input type="number" id="add-stock" placeholder="Enter stock quantity">
                 </div>
 
                 <div class="form-group">
@@ -131,8 +131,17 @@
         <div class="Delete-content">
             <form class="form-container">
                 <div class="form-group">
-                    <label for="find">Title or ISBN</label>
+                    <label for="find">Enter ISBN</label>
                     <input type="text" id="find" placeholder="Enter book title ISBN to delete">
+                </div>
+
+                <div class="Book-info">
+                    <label>Book Information:</label>
+                    <p id="book-info">Title: <span id="book-title"></span></p>
+                    <p id="book-info">Author: <span id="book-author"></span></p>
+                    <p id="book-info">ISBN: <span id="book-isbn"></span></p>
+                    <p id="book-info">Price: <span id="book-price"></span></p>
+                    <p id="book-info">Stock: <span id="book-stock"></span></p>
                 </div>
                 
                 <div class="form-group">
