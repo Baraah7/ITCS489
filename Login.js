@@ -1,10 +1,10 @@
-let user = document.querySelector(".input#username");
-let password = document.querySelector(".input#password");
+let user = document.querySelector("#username");
+let password = document.querySelector("#password");
 
-let loginButton = document.querySelector(".loginButton");
+let Button = document.getElementById("loginButton");
 let errorMessage = document.querySelector(".errorMessage");
 
-loginButton.addEventListener("click", Login);
+Button.addEventListener("click", Login);
 
 function Login() {
   let userValue = user.value;
