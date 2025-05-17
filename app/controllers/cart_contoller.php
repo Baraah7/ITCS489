@@ -52,5 +52,25 @@ class CartController {
         }
         echo json_encode(['success' => false]);
     }
+
+        public function addToCart() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            $bookId = filter_var($data['book_id'] ?? null, FILTER_VALIDATE_INT);
+            $quantity = filter_var($data['quantity'] ?? 1, FILTER_VALIDATE_INT);
+            
+            if ($bookId && $quantity > 0) {
+                $success = $this->model->addToCart($this->sessionId, $bookId, $quantity);
+                $cartCount = $this->model->getCartCount($this->sessionId);
+                echo json_encode([
+                    'success' => $success,
+                    'cart_count' => $cartCount
+                ]);
+                exit;
+            }
+        }
+        echo json_encode(['success' => false]);
+    }
 }
 ?>
