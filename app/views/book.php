@@ -108,7 +108,7 @@ if (!isset($book) || !is_array($book)) {
                         </div>
                         <div>
                             <h3 class="font-semibold text-gray-900">ISBN</h3>
-                            <p class="text-gray-600"><?php echo htmlspecialchars($book['isbn']); ?></p>
+                            <p class="text-gray-600"><?php echo isset($book['isbn']) ? htmlspecialchars($book['isbn']) : 'N/A'; ?></p>
                         </div>
                         <div>
                             <h3 class="font-semibold text-gray-900">Pages</h3>
@@ -205,13 +205,13 @@ if (!isset($book) || !is_array($book)) {
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <?php foreach ($relatedBooks as $relatedBook): ?>
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <a href="/book/<?php echo $relatedBook['id']; ?>">
+                    <a href="book.php?id=<?php echo $relatedBook['id']; ?>">
                         <img src="<?php echo htmlspecialchars($relatedBook['cover_image']); ?>" 
                              alt="<?php echo htmlspecialchars($relatedBook['title']); ?>" 
                              class="w-full h-48 object-contain p-4">
                     </a>
                     <div class="p-4">
-                        <a href="/book/<?php echo $relatedBook['id']; ?>" class="block">
+                        <a href="book.php?id=<?php echo $relatedBook['id']; ?>" class="block">
                             <h3 class="text-lg font-semibold text-gray-900 mb-1 hover:text-blue-600"><?php echo htmlspecialchars($relatedBook['title']); ?></h3>
                         </a>
                         <p class="text-gray-600 text-sm mb-2">by Author Name</p>
