@@ -10,11 +10,17 @@ class CartController {
         $this->sessionId = session_id();
     }
 
+    private function jsonResponse($data) {
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
+    }
+
     public function showCart() {
         $cartItems = $this->model->getCartItems($this->sessionId);
         $cartTotal = $this->model->getCartTotal($this->sessionId);
         
-        include 'views/cart.php';
+        include __DIR__ . '/../views/cart.php';
     }
 
     public function updateCart() {
@@ -51,6 +57,48 @@ class CartController {
             exit;
         }
         echo json_encode(['success' => false]);
+    }
+
+    public function addToCart() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->jsonResponse(['success' => false, 'message' => 'Invalid request method']);
+        }
+
+        // Get JSON input
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        if (!$data) {
+            $this->jsonResponse(['success' => false, 'message' => 'Invalid JSON data']);
+        }
+
+        $bookId = filter_var($data['book_id'] ?? null, FILTER_VALIDATE_INT);
+        $quantity = filter_var($data['quantity'] ?? 1, FILTER_VALIDATE_INT);
+
+        if (!$bookId || $quantity < 1) {
+            $this->jsonResponse(['success' => false, 'message' => 'Invalid book ID or quantity']);
+        }
+
+        $success = $this->model->addToCart($this->sessionId, $bookId, $quantity);
+        if ($success) {
+            $cartItems = $this->model->getCartItems($this->sessionId);
+            $cartCount = count($cartItems);
+            $this->jsonResponse([
+                'success' => true,
+                'message' => 'Item added to cart successfully',
+                'cart_count' => $cartCount
+            ]);
+        } else {
+            $this->jsonResponse(['success' => false, 'message' => 'Failed to add item to cart']);
+        }
+    }
+
+    public function getCartCount() {
+        $cartItems = $this->model->getCartItems($this->sessionId);
+        $this->jsonResponse([
+            'success' => true,
+            'count' => count($cartItems)
+        ]);
     }
 }
 ?>
