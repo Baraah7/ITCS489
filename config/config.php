@@ -1,7 +1,7 @@
 <?php
 return [
   'host' => 'localhost',
-  'dbname' => 'bookstore',
+  'dbname' => 'baghdad_bookstore',
   'username' => 'root',
   'password' => ''
 ];
