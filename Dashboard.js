@@ -27,22 +27,21 @@ let editform = document.querySelector("#edit-form");
 editbutton.addEventListener("click", findbook);
 
 function findbook() {
-    let bookId = document.getElementById("find-input").value;
+  let bookId = document.getElementById("find-input").value;
 
-    fetch(`http://localhost/app/controllers/book_controller.php?action=showBookDetails&id=${bookId}`)
+  fetch(`http://localhost/app/controllers/book_controller.php?action=showBookDetails&id=${bookId}`)
   .then(response => {
     if (!response.ok) {
       throw new Error('Book not found');
     }
-    return response.json();
+      return response.json();
   })
   .then(data => {
-    // Populate the edit form with the book details
+
     document.getElementById("edit-title").value = data.title;
     document.getElementById("edit-author").value = data.author;
     document.getElementById("edit-isbn").value = data.isbn;
 
-    // Show the edit form
     editform.style.display = "flex";
   })
   .catch(error => {
@@ -51,5 +50,61 @@ function findbook() {
 }
 
 let AddSubmitB = document.querySelector(".Add-content .form-button[type='submit']");
+
+AddSubmitB.addEventListener("click", function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    let title = document.getElementById("add-title").value;
+    let author = document.getElementById("add-author  ").value;
+    let stock = document.getElementById("add-stock").value;
+    let price = document.getElementById("add-price").value;
+
+    let formData = new FormData();
+    formData.append("title", title);
+    formData.append("author", author);
+    formData.append("stock", stock);
+    formData.append("price", price);
+    formData.append("action", "addBook");
+    fetch("http://localhost/app/controllers/book_controller.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Book added:", data);
+        // Optionally, you can reset the form or show a success message
+        document.getElementById("add-form").reset();
+    })
+    .catch(error => {
+        console.error("Error adding book:", error);
+    });
+})   
+
 let DeleteSubmitB = document.getElementById("find-delete");
+DeleteSubmitB.addEventListener("click", function(event) {
+  event.preventDefault(); // Prevent the default form submission
+
+  let bookId = document.getElementById("find-delete-input").value;
+
+  fetch(`http://localhost/app/controllers/book_controller.php?action=deleteBook&id=${bookId}`, {
+    method: 'DELETE'
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Book not found');
+    }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Book deleted:', data);
+    })
+    .catch(error => {
+      console.error('Error deleting book:', error);
+    });
+});
 
