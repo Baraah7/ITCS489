@@ -7,23 +7,22 @@ class BookModel {
     }
 
     public function getBookById($bookId) {
-        $query = "SELECT b.*, a.name as author_name, g.name as genre_name 
+        $query = "SELECT b.*, b.author as author_name, c.name as genre_name 
                   FROM books b
-                  JOIN authors a ON b.author_id = a.id
-                  JOIN genres g ON b.genre_id = g.id
+                  LEFT JOIN categories c ON b.category_id = c.id
                   WHERE b.id = ?";
         $stmt = $this->db->prepare($query);
         $stmt->execute([$bookId]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getRelatedBooks($bookId, $genreId, $limit = 4) {
+    public function getRelatedBooks($bookId, $categoryId, $limit = 4) {
         $query = "SELECT b.id, b.title, b.price, b.cover_image 
                   FROM books b
-                  WHERE b.genre_id = ? AND b.id != ?
-                  LIMIT ?";
+                  WHERE b.category_id = ? AND b.id != ?
+                  LIMIT $limit";
         $stmt = $this->db->prepare($query);
-        $stmt->execute([$genreId, $bookId, $limit]);
+        $stmt->execute([$categoryId, $bookId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
