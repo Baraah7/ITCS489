@@ -1,8 +1,17 @@
 <?php
 // This would be included by the controller
 // $book and $relatedBooks variables are available from the controller
+
+// Fix header include path
+include __DIR__ . '/layout/header.php';
+
+// Prevent errors if $book is not set
+if (!isset($book) || !is_array($book)) {
+    echo '<div class="text-red-600 font-bold p-4">Book details not available.</div>';
+    include __DIR__ . '/layout/footer.php';
+    return;
+}
 ?>
-<?php include '../app/views/layout/header.php'; ?>
     
     <div class="container mx-auto px-4 py-8">
         <!-- Breadcrumbs -->
@@ -332,4 +341,4 @@
         });
     </script>
 
-<?php include '../app/views/layout/footer.php'; ?>
+<?php include __DIR__ . '/layout/footer.php'; ?>
