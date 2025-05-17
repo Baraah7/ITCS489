@@ -30,5 +30,37 @@ function findbook() {
     editform.style.display = "flex";
 }
 
+let FindEditB = document.getElementById("find-edit");
+let EditSubmitB = document.querySelector("#edit-form .form-button[type='submit']");
 
+let bookId = document.getElementById("find-input").value;
+
+FindEditB.addEventListener("click", function () {
+    fetch(`http://localhost/ITCS489/book/details/${bookId}`)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Book not found');
+    }
+    return response.json();
+  })
+  .then(data => {
+    // Populate the edit form with the book details
+    document.getElementById("edit-title").value = data.title;
+    document.getElementById("edit-author").value = data.author;
+    document.getElementById("edit-genre").value = data.genre;
+    document.getElementById("edit-publisher").value = data.publisher;
+    document.getElementById("edit-year").value = data.year;
+    document.getElementById("edit-isbn").value = data.isbn;
+
+    // Show the edit form
+    editform.style.display = "flex";
+  })
+  .catch(error => {
+    console.error('Error fetching book:', error);
+  });
+
+});
+
+let AddSubmitB = document.querySelector(".Add-content .form-button[type='submit']");
+let DeleteSubmitB = document.getElementById("find-delete");
 

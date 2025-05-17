@@ -26,7 +26,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Book ISBN</th>
+                        <th>Book ID</th>
                         <th>Title</th>
                         <th>Quantity</th>
                         <th>Profit</th>
@@ -34,15 +34,15 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td data-label="Book ISBN">1001</td>
+                        <td data-label="Book ID">1001</td>
                         <td data-label="Title">John Doe</td>
-                        <td data-label="Quantity">$50.00</td>
+                        <td data-label="Stock">$50.00</td>
                         <td data-label="Profit">Shipped</td>
                     </tr>
                     <tr>
-                        <td data-label="Book ISBN">1002</td>
+                        <td data-label="Book ID">1002</td>
                         <td data-label="Title">Jane Smith</td>
-                        <td data-label="Quantity">$75.00</td>
+                        <td data-label="Stock">$75.00</td>
                         <td data-label="Profit">Processing</td>
                     </tr>
                 </tbody>
@@ -53,15 +53,17 @@
             
             <form id="input-form" class="form-container">
                 <div class="form-group">
-                    <label for="find">Title or ISBN</label>
-                    <input type="text" id="find" placeholder="Enter book title ISBN to delete">
-                    <button id="find-edit" type="button" class="form-button">Show</button>
-                    <button type="reset" class="form-button">Cancel</button>
+                    <label for="find">Book ID</label>
+                    <input type="text" id="find-input" placeholder="Enter book id to Show">
+                    <div>
+                        <button id="find-edit" type="button" class="form-button">Show</button>
+                        <button type="reset" class="form-button">Cancel</button>
+                    </div>
                 </div>
             </form>
 
             <form class="form-container" id="edit-form">
-                <label>Edit bood information:</label> <br>
+                <label>Edit book information:</label> <br>
                 <div class="form-group">
                     <label for="title">Title</label>
                     <input type="text" id="edit-title" placeholder="Enter book title">
