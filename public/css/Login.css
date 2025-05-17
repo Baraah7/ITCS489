@@ -3,7 +3,7 @@ body{
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
-    background-image: url('Book.png');
+    background-image: url('../Images/Book.png');
     background-size: cover;         
     background-position: center 80px;
     background-repeat: no-repeat;
