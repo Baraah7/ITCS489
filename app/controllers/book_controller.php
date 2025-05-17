@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/book_model.php';
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json");
 
 class BookController {
     private $model;
