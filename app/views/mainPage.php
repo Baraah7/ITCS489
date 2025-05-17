@@ -48,9 +48,8 @@
                             <a href="#biography" class="block px-4 py-2 text-[#495057] hover:text-[#2A3F5F] hover:bg-gray-50">Biography</a>
                             <a href="#fantasy" class="block px-4 py-2 text-[#495057] hover:text-[#2A3F5F] hover:bg-gray-50">Fantasy</a>
                         </div>
-                    </div>
-                    <a href="#top-sellers" class="nav-item text-[#495057] hover:text-[#2A3F5F]">Top Sellers</a>
-                    <a href="#self-help" class="nav-item text-[#495057] hover:text-[#2A3F5F]">Self Help</a>
+                    </div>                    <a href="#top-sellers" class="nav-item text-[#495057] hover:text-[#2A3F5F]">Top Sellers</a>
+                    <a href="help.php" class="nav-item text-[#495057] hover:text-[#2A3F5F]">Self Help</a>
                     <a href="#new-arrivals" class="nav-item hover:text-[#2A3F5F]">New Arrivals</a>
                     <a href="#offers" class="nav-item hover:text-[#2A3F5F]">Offers</a>
                     <a href="#share" class="nav-item hover:text-[#2A3F5F]">Share Experience</a>
