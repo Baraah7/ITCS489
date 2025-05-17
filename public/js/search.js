@@ -110,12 +110,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const applyFiltersBtn = document.getElementById('apply-filters');
     const resetFiltersBtn = document.getElementById('reset-filters');
     const cartBtn = document.getElementById('cart-btn');
-    const cartCount = document.getElementById('cart-count');
-
-    // State
+    const cartCount = document.getElementById('cart-count');    // State
     let currentPage = 1;
     const booksPerPage = 8;
-    let cartItems = [];
+    
+    // Initialize cart
+    fetch('/ITCS489/public/index.php?route=cart/count')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && cartCount) {
+                cartCount.textContent = data.count;
+            }
+        })
+        .catch(console.error);
 
     // Toggle advanced search
     advancedSearchToggle.addEventListener('click', function() {
@@ -278,25 +285,81 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add to cart
     function addToCart(bookId) {
-        const book = books.find(b => b.id === bookId);
-        if (book) {
-            cartItems.push(book);
-            cartCount.textContent = cartItems.length;
-            
-            // Show notification
-            const notification = document.createElement('div');
-            notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center';
-            notification.innerHTML = `
-                <i class="fas fa-check-circle mr-2"></i>
-                Added "${book.title}" to cart
-            `;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.add('opacity-0', 'transition-opacity', 'duration-500');
-                setTimeout(() => notification.remove(), 500);
-            }, 2000);
-        }
+        // Show loading state
+        const button = document.querySelector(`.add-to-cart[data-id="${bookId}"]`);
+        const originalText = button.textContent;
+        button.textContent = 'Adding...';
+        button.disabled = true;
+          fetch('/ITCS489/public/index.php?route=cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                book_id: bookId,
+                quantity: 1
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text().then(text => {
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('Invalid JSON:', text);
+                    throw new Error('Invalid JSON response from server');
+                }
+            });
+        })
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                button.textContent = 'Added to Cart!';
+                button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                button.classList.add('bg-green-600', 'hover:bg-green-700');
+                
+                // Update cart count in navbar
+                const cartCount = document.getElementById('cartCount');
+                if (cartCount) {
+                    cartCount.textContent = data.cart_count;
+                }
+                
+                // Show notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center z-50';
+                notification.innerHTML = `
+                    <i class="fas fa-check-circle mr-2"></i>
+                    ${data.message}
+                `;
+                document.body.appendChild(notification);
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    button.disabled = false;
+                    
+                    // Fade out and remove notification
+                    notification.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+                    setTimeout(() => notification.remove(), 500);
+                }, 2000);
+            } else {
+                // Show error message
+                button.textContent = originalText;
+                button.disabled = false;
+                alert(data.message || 'Failed to add item to cart');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            button.textContent = originalText;
+            button.disabled = false;
+            alert('An error occurred while adding item to cart');
+        });
     }
 
     // Event listeners
@@ -335,9 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const filteredBooks = sortBooks(searchBooks());
         displayBooks(filteredBooks);
-    });
-
-    // Event delegation for add to cart buttons
+    });    // Event delegation for add to cart buttons
     resultsContainer.addEventListener('click', function(e) {
         if (e.target.classList.contains('add-to-cart') || e.target.closest('.add-to-cart')) {
             const button = e.target.classList.contains('add-to-cart') ? e.target : e.target.closest('.add-to-cart');
@@ -348,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Cart button
     cartBtn.addEventListener('click', function() {
-        alert(`You have ${cartItems.length} items in your cart.`);
+        window.location.href = '/ITCS489/public/index.php?route=cart';
     });
 
     // Initial display

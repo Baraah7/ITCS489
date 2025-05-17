@@ -13,6 +13,7 @@
 </head>
 <body class="bg-gray-50">
     <!-- Navigation would be included here -->
+    <?php include __DIR__ . '/layout/header.php'; ?>
     
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-8">Your Shopping Cart</h1>
@@ -22,7 +23,7 @@
                 <i class="fas fa-shopping-cart text-5xl text-gray-300 mb-4"></i>
                 <h2 class="text-2xl font-semibold text-gray-700 mb-2">Your cart is empty</h2>
                 <p class="text-gray-600 mb-6">Start shopping to add items to your cart</p>
-                <a href="/" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
+                <a href="/ITCS489/public/index.php" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
                     Continue Shopping
                 </a>
             </div>
@@ -43,12 +44,12 @@
                                 <div class="cart-item grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border-b" data-cart-item-id="<?php echo $item['cart_item_id']; ?>">
                                     <!-- Product Info -->
                                     <div class="md:col-span-5 flex items-center">
-                                        <img src="<?php echo htmlspecialchars($item['cover_image']); ?>" 
+                                        <img src="/ITCS489/public/Images/<?php echo htmlspecialchars($item['cover_image']); ?>" 
                                              alt="<?php echo htmlspecialchars($item['title']); ?>" 
                                              class="w-16 h-16 object-cover rounded mr-4">
                                         <div>
                                             <h3 class="font-medium text-gray-900">
-                                                <a href="/book/<?php echo $item['book_id']; ?>" class="hover:text-blue-600">
+                                                <a href="/ITCS489/public/index.php?route=book&id=<?php echo $item['book_id']; ?>" class="hover:text-blue-600">
                                                     <?php echo htmlspecialchars($item['title']); ?>
                                                 </a>
                                             </h3>
@@ -92,7 +93,7 @@
                             <button id="clearCartBtn" class="text-red-500 hover:text-red-700">
                                 <i class="fas fa-trash-alt mr-1"></i> Clear Cart
                             </button>
-                            <a href="/" class="text-blue-600 hover:text-blue-800">
+                            <a href="/ITCS489/public/index.php" class="text-blue-600 hover:text-blue-800">
                                 <i class="fas fa-arrow-left mr-1"></i> Continue Shopping
                             </a>
                         </div>
@@ -153,7 +154,7 @@
         <?php endif; ?>
     </div>
 
-    <!-- Footer would be included here -->
+    <?php include __DIR__ . '/layout/footer.php'; ?>
 
     <script>
         // Update quantity function
@@ -166,7 +167,7 @@
             inputElement.value = newValue;
             
             // Send the update to the server
-            fetch('/cart/update', {
+            fetch('/ITCS489/public/index.php?route=cart/update', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -183,7 +184,7 @@
                     // Revert the input value if the update failed
                     inputElement.value = parseInt(inputElement.value) - change;
                 } else {
-                    // Update the cart total in the UI (would need to implement this)
+                    // Update the cart total in the UI
                     updateCartTotals();
                 }
             })
@@ -201,7 +202,7 @@
                 const cartItemElement = document.querySelector(`.cart-item[data-cart-item-id="${cartItemId}"]`);
                 
                 if (confirm('Are you sure you want to remove this item from your cart?')) {
-                    fetch('/cart/remove', {
+                    fetch('/ITCS489/public/index.php?route=cart/remove', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -238,7 +239,7 @@
         // Clear cart
         document.getElementById('clearCartBtn').addEventListener('click', function() {
             if (confirm('Are you sure you want to clear your entire cart?')) {
-                fetch('/cart/clear', {
+                fetch('/ITCS489/public/index.php?route=cart/clear', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -265,7 +266,7 @@
                 const cartItemId = this.getAttribute('data-cart-item-id');
                 const newQuantity = parseInt(this.value);
                 
-                if (isNaN(newQuantity) {
+                if (isNaN(newQuantity)) {
                     this.value = 1;
                     return;
                 }
@@ -278,7 +279,7 @@
                 }
                 
                 // Send the update to the server
-                fetch('/cart/update', {
+                fetch('/ITCS489/public/index.php?route=cart/update', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -309,10 +310,10 @@
 
         // Checkout button
         document.getElementById('checkoutBtn').addEventListener('click', function() {
-            window.location.href = '/checkout';
+            window.location.href = '/ITCS489/public/index.php?route=checkout';
         });
 
-        // Function to update cart totals (would need to implement based on your needs)
+        // Function to update cart totals
         function updateCartTotals() {
             // In a real implementation, you might want to:
             // 1. Fetch the updated cart totals from the server

@@ -1,4 +1,7 @@
 <?php
+// Start the session
+session_start();
+
 // Autoload required files
 require_once __DIR__ . '/../controllers/BookController.php';
 require_once __DIR__ . '/../controllers/UserController.php';

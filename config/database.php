@@ -1,7 +1,6 @@
 <?php
-class database {
-  private $host = 'localhost';
-  private $db   = 'bookstore';
+class database {  private $host = 'localhost';
+  private $db   = 'itcs489';
   private $user = 'root';
   private $pass = '';
   private $charset = 'utf8mb4';
