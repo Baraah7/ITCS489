@@ -30,7 +30,7 @@ function Login() {
     .then((data) => {
       if (data.success) {
         if (data.role === "admin") {
-          window.location.href = "admin_dashboard.html";
+          window.location.href = "Admin.html";
         } else {
           window.location.href = "home.html";
         }
