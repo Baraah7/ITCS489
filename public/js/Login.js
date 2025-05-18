@@ -16,7 +16,7 @@ function Login() {
     return;
   }
 
-  fetch("login.php", {
+  fetch("../../app/controllers/user_controller.php", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -30,9 +30,9 @@ function Login() {
     .then((data) => {
       if (data.success) {
         if (data.role === "admin") {
-          window.location.href = "Admin.html";
+          window.location.href = "../views/Admin.html";
         } else {
-          window.location.href = "home.html";
+          window.location.href = "../views/mainPage.php";
         }
       } else {
         errorMessage.textContent = data.message || "Login failed.";
