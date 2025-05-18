@@ -24,18 +24,12 @@ class book_model {
         $stmt = $this->db->prepare($query);
         $stmt->execute([$categoryId, $bookId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }    public function getAllBooks() {
-        $query = "WITH RankedBooks AS (
-                    SELECT b.*, c.name as genre_name,
-                           ROW_NUMBER() OVER (PARTITION BY b.title, b.author ORDER BY b.id) as rn
-                    FROM books b
-                    LEFT JOIN categories c ON b.category_id = c.id
-                  )
-                  SELECT id, title, author, description, price, rating, stock, cover_image, 
-                         created_at, category_id, genre_name
-                  FROM RankedBooks
-                  WHERE rn = 1
-                  ORDER BY title";
+    }
+
+    public function getAllBooks() {
+        $query = "SELECT b.*, c.name as genre_name 
+                  FROM books b
+                  LEFT JOIN categories c ON b.category_id = c.id";
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -76,23 +70,19 @@ class book_model {
         $query = "DELETE FROM books WHERE id = ?";
         $stmt = $this->db->prepare($query);
         return $stmt->execute([$id]);
-    }    public function searchBooks($query = '', $category = '', $author = '', $minPrice = null, $maxPrice = null, $year = null, $sort = 'relevance') {
+    }
+
+    public function searchBooks($query = '', $category = '', $author = '', $minPrice = null, $maxPrice = null, $year = null, $sort = 'relevance') {
         $conditions = [];
         $params = [];
         $orderBy = '';
 
-        // Base query that selects only one book per title-author combination
-        $sql = "WITH RankedBooks AS (
-                    SELECT b.*, c.name as category,
-                           ROW_NUMBER() OVER (PARTITION BY b.title, b.author ORDER BY b.id) as rn
-                    FROM books b 
-                    LEFT JOIN categories c ON b.category_id = c.id
-                    WHERE b.title IS NOT NULL
-                )
-                SELECT id, title, author, description, price, rating, cover_image, 
-                       created_at as publication_date, category
-                FROM RankedBooks 
-                WHERE rn = 1";// Ensure we get only valid entries
+        // Base query with DISTINCT to prevent duplicates
+        $sql = "SELECT DISTINCT b.id, b.title, b.author, b.description, b.price, b.rating, b.cover_image, 
+                       b.created_at as publication_date, c.name as category 
+                FROM books b 
+                LEFT JOIN categories c ON b.category_id = c.id
+                WHERE b.title IS NOT NULL"; // Ensure we get only valid entries
 
         // Add search conditions
         if (!empty($query)) {
