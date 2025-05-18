@@ -21,13 +21,16 @@
                 <div class="flex justify-between items-center mb-6">                    <div class="text-left">
                         <h1 class="text-5xl font-bold text-[#2A3F5F] mb-2">Baghdad</h1>
                         <p class="subtitle text-[#6B778C] text-lg font-normal">Your go to library of endless, wonderful knowledge</p>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <a href="search.html" class="p-2 text-[#2A3F5F] hover:text-opacity-70" title="Search">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </a>
+                    </div>                    <div class="flex items-center space-x-4">
+                        <form id="searchForm" action="/ITCS489/public/index.php" method="GET" class="relative flex items-center">
+                            <input type="hidden" name="route" value="search">
+                            <input type="text" name="q" placeholder="Search books..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#2A3F5F] w-64" required>
+                            <button type="submit" class="absolute left-3 text-[#2A3F5F] hover:text-opacity-70" title="Search">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </button>
+                        </form>
                         <a href="#login" class="px-6 py-2 bg-[#2A3F5F] text-white rounded-full hover:opacity-90">Log In</a>
                         <a href="#about" class="button secondary px-6 py-2 bg-[#E8E9EB] text-[#2A3F5F] rounded-full hover:bg-gray-300">About Us</a>
                     </div>
@@ -74,7 +77,7 @@
                 <h2 class="section-title text-3xl font-bold text-[#2A3F5F] mb-8 px-8">Top Sellers</h2>
                 <div class="box-container grid grid-cols-1 md:grid-cols-3 gap-8 px-8">                    <!-- BOOK CARD 1 -->
                     <div class="book-card bg-[#D0B8A8] rounded-xl shadow-[0_4px_6px_rgba(0,0,0,0.05)] p-6 hover:shadow-lg">
-                        <a href="index.php?route=book&id=10" class="block">
+                        <a href="index.php?route=book/show&id=10" class="block">
                             <div class="image-box bg-[#D0B8A8] rounded-lg h-64">
                                 <img src="Images/books1.png" alt="Book Cover" class="w-full h-full object-contain">
                             </div>
@@ -86,7 +89,7 @@
 
                     <!-- BOOK CARD 2 -->
                     <div class="book-card bg-[#D0B8A8] rounded-xl shadow-[0_4px_6px_rgba(0,0,0,0.05)] p-6 hover:shadow-lg">
-                        <a href="index.php?route=book&id=11" class="block">
+                        <a href="index.php?route=book/show&id=11" class="block">
                             <div class="image-box bg-[#D0B8A8] rounded-lg h-64">
                                 <img src="Images/book 3.bmp" alt="Book Cover" class="w-full h-full object-contain">
                             </div>
@@ -98,7 +101,7 @@
 
                     <!-- BOOK CARD 3 -->
                     <div class="book-card bg-[#D0B8A8] rounded-xl shadow-[0_4px_6px_rgba(0,0,0,0.05)] p-6 hover:shadow-lg">
-                        <a href="index.php?route=book&id=12" class="block">
+                        <a href="index.php?route=book/show&id=12" class="block">
                             <div class="image-box bg-[#D0B8A8] rounded-lg h-64">
                                 <img src="Images/book 4.bmp" alt="Book Cover" class="w-full h-full object-contain">
                             </div>
