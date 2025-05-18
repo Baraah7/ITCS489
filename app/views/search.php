@@ -6,21 +6,26 @@
     <title>Book Haven - Search Books</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add defer to ensure DOM is loaded before script runs -->
+    <script src="/ITCS489/public/js/search.js" defer></script>
 </head>
-<body class="min-h-screen" style="background-color: #FFF9F4">    <!-- Navigation -->
+<body class="min-h-screen" style="background-color: #FFF9F4">
+    <!-- Navigation -->
     <nav style="background-color: #2A3F5F" class="text-white shadow-lg">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold">Baghdad</a>            <div class="flex items-center space-x-4">
+            <a href="/ITCS489/public/index.php" class="text-2xl font-bold">Baghdad</a>
+            <div class="flex items-center space-x-4">
                 <a href="/ITCS489/public/index.php" class="hover:text-gray-200">Home</a>
                 <a href="/ITCS489/public/index.php?route=categories" class="hover:text-gray-200">Categories</a>
                 <a href="/ITCS489/public/index.php?route=bestsellers" class="hover:text-gray-200">Best Sellers</a>
-                <a href="/ITCS489/public/index.php?route=about" class="hover:text-gray-200">About</a>                <div class="relative">
+                <a href="/ITCS489/public/index.php?route=about" class="hover:text-gray-200">About</a>
+                <div class="relative">
                     <a href="/ITCS489/public/index.php?route=cart" id="cart-btn" class="hover:text-gray-200 relative inline-block">
                         <i class="fas fa-shopping-cart text-xl"></i>
                         <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
                     </a>
                 </div>
-                <a href="#" class="px-4 py-2 bg-gray-200 text-[#2A3F5F] rounded-md hover:bg-gray-300">Sign In</a>
+                <a href="/ITCS489/public/index.php?route=login" class="px-4 py-2 bg-gray-200 text-[#2A3F5F] rounded-md hover:bg-gray-300">Sign In</a>
             </div>
         </div>
     </nav>
@@ -34,11 +39,16 @@
             <div class="bg-white rounded-lg shadow-md p-6 mb-8">
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex-grow relative">
-                        <input type="text" id="search-input" placeholder="Search by title, author, or ISBN..." 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">                        <button id="search-btn" class="absolute right-3 top-3 text-gray-500 hover:text-[#2A3F5F]">
+                        <input type="text" 
+                               id="search-input" 
+                               placeholder="Search by title, author, or ISBN..." 
+                               value="<?php echo htmlspecialchars($_GET['q'] ?? ''); ?>"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2A3F5F]">
+                        <button id="search-btn" class="absolute right-3 top-3 text-gray-500 hover:text-[#2A3F5F]">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
+                    
                     <select id="category-filter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2A3F5F]">
                         <option value="">All Categories</option>
                         <option value="fiction">Fiction</option>
@@ -49,6 +59,7 @@
                         <option value="mystery">Mystery</option>
                         <option value="romance">Romance</option>
                     </select>
+                    
                     <button id="advanced-search-toggle" class="px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg">
                         Advanced <i class="fas fa-caret-down ml-1"></i>
                     </button>
@@ -77,7 +88,8 @@
                     <div class="mt-4 flex justify-end">
                         <button id="reset-filters" class="px-4 py-2 text-gray-600 hover:text-gray-800 mr-2">
                             Reset
-                        </button>                        <button id="apply-filters" style="background-color: #2A3F5F" class="px-4 py-2 text-white rounded-lg hover:opacity-90">
+                        </button>
+                        <button id="apply-filters" style="background-color: #2A3F5F" class="px-4 py-2 text-white rounded-lg hover:opacity-90">
                             Apply Filters
                         </button>
                     </div>
@@ -91,7 +103,7 @@
                 <h2 class="text-2xl font-semibold text-gray-800">Search Results</h2>
                 <div class="flex items-center">
                     <span class="mr-2 text-gray-600">Sort by:</span>
-                    <select id="sort-by" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select id="sort-by" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2A3F5F]">
                         <option value="relevance">Relevance</option>
                         <option value="price-low">Price: Low to High</option>
                         <option value="price-high">Price: High to Low</option>
@@ -103,8 +115,8 @@
                 </div>
             </div>
 
+            <!-- Results Grid -->
             <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- Results will be dynamically inserted here -->
                 <div class="text-center py-12 text-gray-500">
                     <i class="fas fa-search fa-3x mb-4"></i>
                     <p>Enter a search term to find books</p>
@@ -173,8 +185,6 @@
                 <p>&copy; 2023 Book Haven. All rights reserved.</p>
             </div>
         </div>
-    </footer>    <!-- JavaScript -->
-    <script src="../../public/js/search.js"></script>
-       
+    </footer>
 </body>
 </html>

@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../app/controllers/book_controller.php';
 require_once __DIR__ . '/../app/controllers/order_controller.php';
 require_once __DIR__ . '/../app/controllers/user_controller.php';
+require_once __DIR__ . '/../app/controllers/search_api.php';
 require_once __DIR__ . '/../app/core/database.php';
 // Add more as needed...
 
@@ -14,11 +15,21 @@ session_start();
 $bookController = new BookController($db);
 $orderController = new OrderController($db);
 $userController = new UserController($db);
+$searchAPI = new SearchAPI($db);
 
 // Determine route from query string
 $route = $_GET['route'] ?? 'home';
 
 switch ($route) {
+    // Search routes
+    case 'search/api':
+        $searchAPI->search();
+        break;
+
+    case 'search':
+        include __DIR__ . '/../app/views/search.php';
+        break;
+
     // Book routes
     case 'books':
         $bookController->index();
@@ -124,6 +135,8 @@ switch ($route) {
 
     case 'logout':
         $userController->logout();
+        break;    case 'search':
+        include __DIR__ . '/../app/views/search.php';
         break;
 
     case 'home':
