@@ -1,96 +1,28 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Sample book data - in a real app, this would come from an API
-    const books = [
-        {
-            id: 1,
-            title: "The Silent Patient",
-            author: "Alex Michaelides",
-            price: 12.99,
-            rating: 4.5,
-            category: "mystery",
-            year: 2019,
-            cover: "https://m.media-amazon.com/images/I/71hTq4QqgBL._AC_UF1000,1000_QL80_.jpg",
-            description: "A psychological thriller about a woman who shoots her husband and then stops speaking."
-        },
-        {
-            id: 2,
-            title: "Educated",
-            author: "Tara Westover",
-            price: 14.95,
-            rating: 4.7,
-            category: "biography",
-            year: 2018,
-            cover: "https://m.media-amazon.com/images/I/71I7snGfQVL._AC_UF1000,1000_QL80_.jpg",
-            description: "A memoir about a woman who leaves her survivalist family and goes on to earn a PhD from Cambridge University."
-        },
-        {
-            id: 3,
-            title: "Dune",
-            author: "Frank Herbert",
-            price: 9.99,
-            rating: 4.8,
-            category: "science",
-            year: 1965,
-            cover: "https://m.media-amazon.com/images/I/81ym3QUd3KL._AC_UF1000,1000_QL80_.jpg",
-            description: "A science fiction novel about a desert planet and the boy who would become its messiah."
-        },
-        {
-            id: 4,
-            title: "The Midnight Library",
-            author: "Matt Haig",
-            price: 13.49,
-            rating: 4.2,
-            category: "fiction",
-            year: 2020,
-            cover: "https://m.media-amazon.com/images/I/81Kc8OsbDxL._AC_UF1000,1000_QL80_.jpg",
-            description: "A novel about a library between life and death where each book represents a different life path."
-        },
-        {
-            id: 5,
-            title: "Atomic Habits",
-            author: "James Clear",
-            price: 11.98,
-            rating: 4.6,
-            category: "non-fiction",
-            year: 2018,
-            cover: "https://m.media-amazon.com/images/I/91bYsX41DVL._AC_UF1000,1000_QL80_.jpg",
-            description: "A guide to building good habits and breaking bad ones with tiny changes."
-        },
-        {
-            id: 6,
-            title: "The Hobbit",
-            author: "J.R.R. Tolkien",
-            price: 8.99,
-            rating: 4.9,
-            category: "fantasy",
-            year: 1937,
-            cover: "https://m.media-amazon.com/images/I/710+HcoP38L._AC_UF1000,1000_QL80_.jpg",
-            description: "A fantasy novel about a hobbit who goes on an adventure with a group of dwarves."
-        },
-        {
-            id: 7,
-            title: "Where the Crawdads Sing",
-            author: "Delia Owens",
-            price: 10.49,
-            rating: 4.8,
-            category: "fiction",
-            year: 2018,
-            cover: "https://m.media-amazon.com/images/I/81O1oy0y9eL._AC_UF1000,1000_QL80_.jpg",
-            description: "A novel about a girl who raises herself in the marshes of North Carolina."
-        },
-        {
-            id: 8,
-            title: "The Song of Achilles",
-            author: "Madeline Miller",
-            price: 12.99,
-            rating: 4.6,
-            category: "romance",
-            year: 2011,
-            cover: "https://m.media-amazon.com/images/I/91Q9Skk9JhL._AC_UF1000,1000_QL80_.jpg",
-            description: "A retelling of the Iliad from the perspective of Patroclus, Achilles' lover."
-        }
-    ];
+// Function to perform search
+async function performSearch(searchTerm) {
+    if (!searchInput || !resultsContainer) {
+        console.error('Required DOM elements not found');
+        return;
+    }
+    const searchParams = {
+        q: searchTerm || searchInput.value || '',
+        category: categoryFilter?.value || '',
+        author: authorFilter?.value || '',
+        minPrice: minPrice?.value || '',
+        maxPrice: maxPrice?.value || '',
+        year: yearFilter?.value || '',
+        sort: sortBy?.value || 'relevance'
+    };
+    
+    const books = await fetchBooks(searchParams);
+    displayBooks(books);
+}
 
+// Debug to verify script is loading
+console.log('Search script loaded!');
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content loaded!');
     // DOM Elements
     const searchInput = document.getElementById('search-input');
     const searchBtn = document.getElementById('search-btn');
@@ -107,127 +39,132 @@ document.addEventListener('DOMContentLoaded', function() {
     const pageNumbers = document.getElementById('page-numbers');
     const advancedSearchToggle = document.getElementById('advanced-search-toggle');
     const advancedSearch = document.getElementById('advanced-search');
-    const applyFiltersBtn = document.getElementById('apply-filters');
-    const resetFiltersBtn = document.getElementById('reset-filters');
-    const cartBtn = document.getElementById('cart-btn');
-    const cartCount = document.getElementById('cart-count');    // State
-    let currentPage = 1;
-    const booksPerPage = 8;
-    
-    // Initialize cart
-    fetch('/ITCS489/public/index.php?route=cart/count')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success && cartCount) {
-                cartCount.textContent = data.count;
-            }
-        })
-        .catch(console.error);
 
-    // Toggle advanced search
-    advancedSearchToggle.addEventListener('click', function() {
-        advancedSearch.classList.toggle('hidden');
-        const icon = advancedSearchToggle.querySelector('i');
-        if (advancedSearch.classList.contains('hidden')) {
-            icon.classList.remove('fa-caret-up');
-            icon.classList.add('fa-caret-down');
-        } else {
-            icon.classList.remove('fa-caret-down');
-            icon.classList.add('fa-caret-up');
-        }
+    // Debug log DOM elements
+    console.log('DOM Elements found:', {
+        searchInput: !!searchInput,
+        searchBtn: !!searchBtn,
+        categoryFilter: !!categoryFilter,
+        resultsContainer: !!resultsContainer,
     });
 
-    // Search and filter functions
-    function searchBooks() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const category = categoryFilter.value;
-        const author = authorFilter.value.toLowerCase();
-        const min = minPrice.value ? parseFloat(minPrice.value) : null;
-        const max = maxPrice.value ? parseFloat(maxPrice.value) : null;
-        const year = yearFilter.value ? parseInt(yearFilter.value) : null;
+    // State
+    let currentPage = 1;
+    const booksPerPage = 8;
 
-        return books.filter(book => {
-            // Search term matches title or author
-            const matchesSearch = !searchTerm || 
-                book.title.toLowerCase().includes(searchTerm) || 
-                book.author.toLowerCase().includes(searchTerm);
+    // Function to fetch books from API
+    async function fetchBooks(searchParams = {}) {
+        try {
+            console.log('Fetching books with params:', searchParams);
+            const queryString = new URLSearchParams(searchParams).toString();
+            const url = `/ITCS489/public/index.php?route=search/api&${queryString}`;
+            console.log('API URL:', url);
 
-            // Category filter
-            const matchesCategory = !category || book.category === category;
+            const response = await fetch(url);
+            console.log('API Response status:', response.status);
 
-            // Author filter
-            const matchesAuthor = !author || book.author.toLowerCase().includes(author);
-
-            // Price range
-            const matchesPrice = (!min || book.price >= min) && (!max || book.price <= max);
-
-            // Year
-            const matchesYear = !year || book.year === year;
-
-            return matchesSearch && matchesCategory && matchesAuthor && matchesPrice && matchesYear;
-        });
-    }
-
-    // Sort books
-    function sortBooks(filteredBooks) {
-        const sortValue = sortBy.value;
-        
-        return [...filteredBooks].sort((a, b) => {
-            switch(sortValue) {
-                case 'price-low':
-                    return a.price - b.price;
-                case 'price-high':
-                    return b.price - a.price;
-                case 'title-asc':
-                    return a.title.localeCompare(b.title);
-                case 'title-desc':
-                    return b.title.localeCompare(a.title);
-                case 'newest':
-                    return b.year - a.year;
-                case 'rating':
-                    return b.rating - a.rating;
-                default: // relevance
-                    return 0;
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        });
+            
+            const data = await response.json();
+            console.log('API Response data:', data);
+
+            if (data.success) {
+                return data.books;
+            }
+            console.error('API error:', data.error || 'Unknown error');
+            return [];
+        } catch (error) {
+            console.error('Error fetching books:', error);
+            return [];
+        }
     }
 
-    // Display books
-    function displayBooks(filteredBooks, page = 1) {
+    // Pagination utilities
+    function setupPagination(totalBooks) {
+        if (!pagination || !pageNumbers || !prevPageBtn || !nextPageBtn) return;
+
+        const totalPages = Math.ceil(totalBooks / booksPerPage);
+        
+        if (totalPages <= 1) {
+            pagination.classList.add('hidden');
+            return;
+        }
+
+        pagination.classList.remove('hidden');
+        pageNumbers.innerHTML = '';
+
+        // Previous button
+        prevPageBtn.disabled = currentPage === 1;
+        prevPageBtn.classList.toggle('opacity-50', currentPage === 1);
+
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            const button = document.createElement('button');
+            button.className = `px-3 py-2 border border-gray-300 ${currentPage === i ? 'bg-[#2A3F5F] text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`;
+            button.textContent = i;
+            button.addEventListener('click', () => {
+                currentPage = i;
+                displayBooks(currentBooks, i);
+            });
+            pageNumbers.appendChild(button);
+        }
+
+        // Next button
+        nextPageBtn.disabled = currentPage === totalPages;
+        nextPageBtn.classList.toggle('opacity-50', currentPage === totalPages);
+    }
+
+    // Function to display books
+    function displayBooks(books, page = 1) {
+        if (!resultsContainer) {
+            console.error('Results container not found');
+            return;
+        }
+
+        console.log('Displaying books:', books);
+        currentBooks = books; // Store the current books
         currentPage = page;
         const startIndex = (page - 1) * booksPerPage;
         const endIndex = startIndex + booksPerPage;
-        const paginatedBooks = filteredBooks.slice(startIndex, endIndex);
+        const paginatedBooks = books.slice(startIndex, endIndex);
 
-        if (filteredBooks.length === 0) {
+        if (books.length === 0) {
             resultsContainer.innerHTML = `
                 <div class="col-span-full text-center py-12 text-gray-500">
                     <i class="fas fa-book-open fa-3x mb-4"></i>
                     <p>No books found matching your search criteria</p>
                 </div>
             `;
-            pagination.classList.add('hidden');
+            if (pagination) {
+                pagination.classList.add('hidden');
+            }
             return;
         }
 
         resultsContainer.innerHTML = paginatedBooks.map(book => `
             <div class="rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow" style="background-color: #D0B8A8">
                 <div class="relative pb-48 overflow-hidden">
-                    <img src="${book.cover}" alt="${book.title}" class="absolute inset-0 w-full h-full object-contain p-4">
+                    <img src="${book.cover || '/ITCS489/public/Images/books1.png'}" 
+                         alt="${book.title}" 
+                         class="absolute inset-0 w-full h-full object-contain p-4">
                 </div>
                 <div class="p-4">
-                    <h3 class="font-bold text-lg mb-1 truncate">${book.title}</h3>
-                    <p class="text-gray-600 text-sm mb-2">${book.author}</p>
+                    <h3 class="font-semibold text-lg mb-2 text-gray-900 line-clamp-2">${book.title}</h3>
+                    <p class="text-gray-600 text-sm mb-2">${book.author || 'Unknown Author'}</p>
                     <div class="flex items-center mb-2">
-                        ${Array(Math.floor(book.rating)).fill('<i class="fas fa-star text-yellow-400"></i>').join('')}
+                        ${Array(Math.ceil(book.rating || 0)).fill('<i class="fas fa-star text-yellow-400"></i>').join('')}
                         ${book.rating % 1 ? '<i class="fas fa-star-half-alt text-yellow-400"></i>' : ''}
-                        ${Array(5 - Math.ceil(book.rating)).fill('<i class="far fa-star text-yellow-400"></i>').join('')}
-                        <span class="text-gray-500 text-sm ml-1">${book.rating}</span>
+                        ${Array(5 - Math.ceil(book.rating || 0)).fill('<i class="far fa-star text-yellow-400"></i>').join('')}
+                        <span class="text-gray-500 text-sm ml-1">${book.rating || 'N/A'}</span>
                     </div>
-                    <p class="text-gray-700 text-sm mb-3 line-clamp-2">${book.description}</p>
+                    <p class="text-gray-700 text-sm mb-3 line-clamp-2">${book.description || ''}</p>
                     <div class="flex justify-between items-center">
-                        <span class="font-bold text-lg">$${book.price.toFixed(2)}</span>
-                        <button class="add-to-cart text-white px-3 py-1 rounded-md text-sm" style="background-color: #2A3F5F; hover:opacity-90" data-id="${book.id}">
+                        <span class="font-bold text-lg">$${(book.price || 0).toFixed(2)}</span>
+                        <button class="add-to-cart text-white px-3 py-1 rounded-md text-sm" 
+                                style="background-color: #2A3F5F; hover:opacity-90" 
+                                data-id="${book.id}">
                             Add to Cart
                         </button>
                     </div>
@@ -235,183 +172,95 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `).join('');
 
-        // Setup pagination
-        setupPagination(filteredBooks.length);
+        setupPagination(books.length);
     }
 
-    // Setup pagination
-    function setupPagination(totalBooks) {
-        const totalPages = Math.ceil(totalBooks / booksPerPage);
-        
-        if (totalPages <= 1) {
-            pagination.classList.add('hidden');
-            return;
-        }
-        
-        pagination.classList.remove('hidden');
-        prevPageBtn.disabled = currentPage === 1;
-        
-        // Clear existing page numbers
-        pageNumbers.innerHTML = '';
-        
-        // Add page numbers
-        for (let i = 1; i <= totalPages; i++) {
-            const pageBtn = document.createElement('button');
-            pageBtn.className = `px-3 py-2 border-t border-b border-gray-300 bg-white ${currentPage === i ? 'text-blue-600 font-bold' : 'text-gray-500 hover:bg-gray-50'}`;
-            pageBtn.textContent = i;
-            pageBtn.addEventListener('click', () => {
-                const filteredBooks = sortBooks(searchBooks());
-                displayBooks(filteredBooks, i);
-            });
-            pageNumbers.appendChild(pageBtn);
-        }
-        
-        // Next button event
-        nextPageBtn.addEventListener('click', () => {
-            if (currentPage < totalPages) {
-                const filteredBooks = sortBooks(searchBooks());
-                displayBooks(filteredBooks, currentPage + 1);
-            }
-        });
-        
-        // Previous button event
-        prevPageBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                const filteredBooks = sortBooks(searchBooks());
-                displayBooks(filteredBooks, currentPage - 1);
-            }
-        });
-    }
+    // Perform search with current filters
+    async function performSearch() {
+        console.log('Performing search...');
+        const searchParams = {
+            q: searchInput?.value || '',
+            category: categoryFilter?.value || '',
+            author: authorFilter?.value || '',
+            minPrice: minPrice?.value || '',
+            maxPrice: maxPrice?.value || '',
+            year: yearFilter?.value || '',
+            sort: sortBy?.value || 'relevance'
+        };
 
-    // Add to cart
-    function addToCart(bookId) {
-        // Show loading state
-        const button = document.querySelector(`.add-to-cart[data-id="${bookId}"]`);
-        const originalText = button.textContent;
-        button.textContent = 'Adding...';
-        button.disabled = true;
-          fetch('/ITCS489/public/index.php?route=cart/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                book_id: bookId,
-                quantity: 1
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text().then(text => {
-                try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    console.error('Invalid JSON:', text);
-                    throw new Error('Invalid JSON response from server');
-                }
-            });
-        })
-        .then(data => {
-            if (data.success) {
-                // Show success message
-                button.textContent = 'Added to Cart!';
-                button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                button.classList.add('bg-green-600', 'hover:bg-green-700');
-                
-                // Update cart count in navbar
-                const cartCount = document.getElementById('cartCount');
-                if (cartCount) {
-                    cartCount.textContent = data.cart_count;
-                }
-                
-                // Show notification
-                const notification = document.createElement('div');
-                notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center z-50';
-                notification.innerHTML = `
-                    <i class="fas fa-check-circle mr-2"></i>
-                    ${data.message}
-                `;
-                document.body.appendChild(notification);
-                
-                // Reset button after 2 seconds
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.classList.remove('bg-green-600', 'hover:bg-green-700');
-                    button.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                    button.disabled = false;
-                    
-                    // Fade out and remove notification
-                    notification.classList.add('opacity-0', 'transition-opacity', 'duration-500');
-                    setTimeout(() => notification.remove(), 500);
-                }, 2000);
-            } else {
-                // Show error message
-                button.textContent = originalText;
-                button.disabled = false;
-                alert(data.message || 'Failed to add item to cart');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            button.textContent = originalText;
-            button.disabled = false;
-            alert('An error occurred while adding item to cart');
-        });
+        console.log('Search parameters:', searchParams);
+        const books = await fetchBooks(searchParams);
+        displayBooks(books);
     }
 
     // Event listeners
-    searchBtn.addEventListener('click', function() {
-        const filteredBooks = sortBooks(searchBooks());
-        displayBooks(filteredBooks);
-    });
-
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            const filteredBooks = sortBooks(searchBooks());
-            displayBooks(filteredBooks);
-        }
-    });
-
-    [categoryFilter, sortBy].forEach(element => {
-        element.addEventListener('change', function() {
-            const filteredBooks = sortBooks(searchBooks());
-            displayBooks(filteredBooks);
+    if (searchBtn) {
+        searchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            performSearch();
         });
-    });
+    }
 
-    applyFiltersBtn.addEventListener('click', function() {
-        const filteredBooks = sortBooks(searchBooks());
-        displayBooks(filteredBooks);
-    });
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch();
+            }
+        });
+    }
 
-    resetFiltersBtn.addEventListener('click', function() {
-        searchInput.value = '';
-        categoryFilter.value = '';
-        authorFilter.value = '';
-        minPrice.value = '';
-        maxPrice.value = '';
-        yearFilter.value = '';
-        sortBy.value = 'relevance';
-        
-        const filteredBooks = sortBooks(searchBooks());
-        displayBooks(filteredBooks);
-    });    // Event delegation for add to cart buttons
-    resultsContainer.addEventListener('click', function(e) {
-        if (e.target.classList.contains('add-to-cart') || e.target.closest('.add-to-cart')) {
-            const button = e.target.classList.contains('add-to-cart') ? e.target : e.target.closest('.add-to-cart');
-            const bookId = parseInt(button.getAttribute('data-id'));
-            addToCart(bookId);
-        }
-    });
+    if (sortBy) {
+        sortBy.addEventListener('change', performSearch);
+    }
 
-    // Cart button
-    cartBtn.addEventListener('click', function() {
-        window.location.href = '/ITCS489/public/index.php?route=cart';
-    });
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', performSearch);
+    }
 
-    // Initial display
-    displayBooks(books);
+    if (advancedSearchToggle) {
+        advancedSearchToggle.addEventListener('click', function() {
+            if (advancedSearch) {
+                advancedSearch.classList.toggle('hidden');
+                const icon = advancedSearchToggle.querySelector('i');
+                if (icon) {
+                    if (advancedSearch.classList.contains('hidden')) {
+                        icon.classList.remove('fa-caret-up');
+                        icon.classList.add('fa-caret-down');
+                    } else {
+                        icon.classList.remove('fa-caret-down');
+                        icon.classList.add('fa-caret-up');
+                    }
+                }
+            }
+        });
+    }
+
+    // Event listeners for pagination
+    if (prevPageBtn) {
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayBooks(currentBooks, currentPage);
+            }
+        });
+    }
+
+    if (nextPageBtn) {
+        nextPageBtn.addEventListener('click', () => {
+            const totalPages = Math.ceil((currentBooks?.length || 0) / booksPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayBooks(currentBooks, currentPage);
+            }
+        });
+    }
+
+    // Initial search
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialQuery = urlParams.get('q');
+    if (initialQuery && searchInput) {
+        searchInput.value = decodeURIComponent(initialQuery);
+    }
+    performSearch();
 });
