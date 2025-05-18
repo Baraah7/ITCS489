@@ -1,32 +1,49 @@
 <?php
 require_once __DIR__ . '/../models/book_model.php';
 
-
 class BookController {
-    private $model;
+    private $bookModel;
 
     public function __construct($db) {
-        $this->model = new BookModel($db);
+        $this->bookModel = new book_model($db);
     }
 
-    public function showBookDetails($bookId) {
-        $book = $this->model->getBookById($bookId);
-        
-        if (!$book) {
-            // Handle book not found
-            header("HTTP/1.0 404 Not Found");
-            include 'views/404.php';
-            exit();
-        }
-
-        // Use category_id instead of genre_id, and handle missing/null category_id
-        $categoryId = isset($book['category_id']) ? $book['category_id'] : null;
-        $relatedBooks = [];
-        if ($categoryId !== null) {
-            $relatedBooks = $this->model->getRelatedBooks($bookId, $categoryId);
-        }
-        
+    public function index() {
+        $books = $this->bookModel->getAllBooks();
+        include 'views/books/index.php';
+    }    public function show($id) {
+        $book = $this->bookModel->getBookById($id);
+        $categoryId = $book['category_id'] ?? null;
+        $relatedBooks = $categoryId ? $this->bookModel->getRelatedBooks($id, $categoryId) : [];
         include __DIR__ . '/../views/book.php';
     }
+
+    public function create() {
+        include 'views/books/create.php';
+    }
+
+    public function store($data) {
+        $this->bookModel->createBook($data);
+        header('Location: index.php?controller=book&action=index');
+    }
+
+    public function edit($id) {
+        $book = $this->bookModel->getBookById($id);
+        include 'views/books/edit.php';
+    }
+
+    public function update($id, $data) {
+        $this->bookModel->updateBook($id, $data);
+        header('Location: index.php?controller=book&action=index');
+    }
+
+    public function delete($id) {
+        $this->bookModel->deleteBook($id);
+        header('Location: index.php?controller=book&action=index');
+    }
+
+    public function showBookDetails($id) {
+        // For backward compatibility, internally use show()
+        return $this->show($id);
+    }
 }
-?>

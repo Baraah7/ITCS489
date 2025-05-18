@@ -1,0 +1,22 @@
+<?php
+class User {
+    public $id, $name, $email, $password, $is_admin, $created_at;
+    private $pdo;
+
+    public function __construct($pdo) {
+        $this->pdo = $pdo;
+    }
+
+    public function findByEmail($email) {
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function find($id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+}
+?>

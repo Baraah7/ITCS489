@@ -74,7 +74,7 @@
                 <h2 class="section-title text-3xl font-bold text-[#2A3F5F] mb-8 px-8">Top Sellers</h2>
                 <div class="box-container grid grid-cols-1 md:grid-cols-3 gap-8 px-8">                    <!-- BOOK CARD 1 -->
                     <div class="book-card bg-[#D0B8A8] rounded-xl shadow-[0_4px_6px_rgba(0,0,0,0.05)] p-6 hover:shadow-lg">
-                        <a href="index.php?route=book&id=10" class="block">
+                        <a href="index.php?route=book/show&id=10" class="block">
                             <div class="image-box bg-[#D0B8A8] rounded-lg h-64">
                                 <img src="Images/books1.png" alt="Book Cover" class="w-full h-full object-contain">
                             </div>
@@ -86,7 +86,7 @@
 
                     <!-- BOOK CARD 2 -->
                     <div class="book-card bg-[#D0B8A8] rounded-xl shadow-[0_4px_6px_rgba(0,0,0,0.05)] p-6 hover:shadow-lg">
-                        <a href="index.php?route=book&id=11" class="block">
+                        <a href="index.php?route=book/show&id=11" class="block">
                             <div class="image-box bg-[#D0B8A8] rounded-lg h-64">
                                 <img src="Images/book 3.bmp" alt="Book Cover" class="w-full h-full object-contain">
                             </div>
@@ -98,7 +98,7 @@
 
                     <!-- BOOK CARD 3 -->
                     <div class="book-card bg-[#D0B8A8] rounded-xl shadow-[0_4px_6px_rgba(0,0,0,0.05)] p-6 hover:shadow-lg">
-                        <a href="index.php?route=book&id=12" class="block">
+                        <a href="index.php?route=book/show&id=12" class="block">
                             <div class="image-box bg-[#D0B8A8] rounded-lg h-64">
                                 <img src="Images/book 4.bmp" alt="Book Cover" class="w-full h-full object-contain">
                             </div>
