@@ -48,51 +48,43 @@ if (!isset($book) || !is_array($book)) {
                 <!-- Book Cover -->
                 <div class="md:w-1/3 p-6 flex justify-center">
                     <img src="<?php echo htmlspecialchars($book['cover_image']); ?>" 
-                         alt="<?php echo htmlspecialchars($book['title']); ?>" 
-                         class="h-96 object-contain rounded-lg shadow-lg"
-                         id="mainBookImage">
-                    <div class="mt-4 flex space-x-2" id="thumbnailContainer">
-                        <!-- Thumbnails would be dynamically added here if available -->
-                    </div>
+                         alt="<?php echo htmlspecialchars($book['title']); ?>"
+                         class="max-w-full h-auto rounded-lg shadow-lg">
                 </div>
-
-                <!-- Book Info -->
-                <div class="md:w-2/3 p-6">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2"><?php echo htmlspecialchars($book['title']); ?></h1>
-                    <p class="text-lg text-gray-600 mb-4">by <?php echo htmlspecialchars($book['author_name']); ?></p>
-                    
-                    <div class="flex items-center mb-4">
-                        <div class="flex text-yellow-400 mr-2">
-                            <?php 
-                            $rating = $book['rating'] ?? 0;
-                            $fullStars = floor($rating);
-                            $halfStar = ($rating - $fullStars) >= 0.5 ? 1 : 0;
-                            $emptyStars = 5 - $fullStars - $halfStar;
-                            
-                            for ($i = 0; $i < $fullStars; $i++) {
-                                echo '<i class="fas fa-star"></i>';
-                            }
-                            if ($halfStar) {
-                                echo '<i class="fas fa-star-half-alt"></i>';
-                            }
-                            for ($i = 0; $i < $emptyStars; $i++) {
-                                echo '<i class="far fa-star"></i>';
-                            }
-                            ?>
-                        </div>
-                        <span class="text-gray-600">(<?php echo $book['review_count'] ?? 0; ?> reviews)</span>
-                    </div>
-
-                    <div class="mb-6">
-                        <span class="text-2xl font-bold text-gray-900">$<?php echo number_format($book['price'], 2); ?></span>
-                        <?php if (isset($book['original_price']) && $book['original_price'] > $book['price']): ?>
-                            <span class="text-lg text-gray-500 line-through ml-2">$<?php echo number_format($book['original_price'], 2); ?></span>
-                            <span class="bg-red-100 text-red-800 text-sm font-semibold ml-2 px-2.5 py-0.5 rounded">
-                                Save <?php echo round(100 - ($book['price'] / $book['original_price'] * 100)); ?>%
-                            </span>
+                
+                <!-- Book Details -->                <div class="md:w-2/3 p-6">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-4"><?php echo htmlspecialchars($book['title']); ?></h1>
+                    <div class="mb-4">
+                        <span class="text-gray-600">By</span>
+                        <span class="text-gray-900 font-medium"><?php echo htmlspecialchars($book['author_name']); ?></span>
+                    </div>                    <!-- Price and Add to Order Form -->
+                    <div class="flex items-center space-x-4 mb-6">
+                        <span class="text-2xl font-bold text-[#2A3F5F]">$<?php echo number_format($book['price'], 2); ?></span>
+                        
+                        <?php if (isset($_SESSION['success'])): ?>
+                            <div class="text-green-600"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
                         <?php endif; ?>
-                    </div>
+                        
+                        <?php if (isset($_SESSION['error'])): ?>
+                            <div class="text-red-600"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                        <?php endif; ?>
 
+                        <form action="index.php?route=order/add" method="POST" class="flex items-center space-x-2">
+                            <input type="hidden" name="book_id" value="<?php echo $book['id']; ?>">
+                            <div class="flex border rounded-md">
+                                <button type="button" class="px-3 py-1 bg-gray-200 text-gray-600" onclick="updateQuantity(-1)">-</button>
+                                <input type="number" name="quantity" id="quantity" value="1" min="1" max="99"
+                                       class="w-16 text-center border-0 focus:ring-0">
+                                <button type="button" class="px-3 py-1 bg-gray-200 text-gray-600" onclick="updateQuantity(1)">+</button>
+                            </div>
+                            <button type="submit" 
+                                    class="px-6 py-2 bg-[#2A3F5F] text-white rounded-md hover:bg-opacity-90 transition-colors">
+                                Add to Order
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Book Description -->
                     <div class="mb-6">
                         <p class="text-gray-700"><?php echo nl2br(htmlspecialchars($book['description'])); ?></p>
                     </div>
@@ -114,31 +106,7 @@ if (!isset($book) || !is_array($book)) {
                             <h3 class="font-semibold text-gray-900">Pages</h3>
                             <p class="text-gray-600"><?php echo number_format($book['page_count']); ?></p>
                         </div>
-                    </div>
-
-                    <div class="flex items-center mb-6">
-                        <div class="mr-4">
-                            <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                            <div class="flex border rounded-md">
-                                <button type="button" class="px-3 py-1 bg-gray-200 text-gray-600 decrement" onclick="updateQuantity(-1)">
-                                    -
-                                </button>
-                                <input type="number" id="quantity" name="quantity" value="1" min="1" max="10" 
-                                       class="w-12 text-center border-0 focus:ring-0">
-                                <button type="button" class="px-3 py-1 bg-gray-200 text-gray-600 increment" onclick="updateQuantity(1)">
-                                    +
-                                </button>
-                            </div>
-                        </div>
-                        <button id="addToCartBtn" 
-                                class="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                                data-book-id="<?php echo $book['id']; ?>">
-                            Add to Cart
-                        </button>
-                        <button class="ml-4 px-6 py-3 border border-gray-300 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-                            <i class="far fa-heart mr-2"></i> Wishlist
-                        </button>
-                    </div>
+                    </div>                    <!-- Removed duplicate quantity control -->
 
                     <div class="border-t pt-4">
                         <h3 class="font-semibold text-gray-900 mb-2">Delivery Options</h3>
@@ -263,53 +231,7 @@ if (!isset($book) || !is_array($book)) {
                     document.getElementById('reviewsContent').classList.remove('hidden');
                 }
             });
-        });
-
-        // Add to cart functionality
-        document.getElementById('addToCartBtn').addEventListener('click', function() {
-            const bookId = this.getAttribute('data-book-id');
-            const quantity = document.getElementById('quantity').value;
-            
-            fetch('/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    book_id: bookId,
-                    quantity: quantity
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show success message
-                    const originalText = this.textContent;
-                    this.textContent = 'Added to Cart!';
-                    this.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                    this.classList.add('bg-green-600', 'hover:bg-green-700');
-                    
-                    // Update cart count in navbar (if exists)
-                    const cartCount = document.getElementById('cartCount');
-                    if (cartCount) {
-                        cartCount.textContent = data.cart_count;
-                    }
-                    
-                    // Reset button after 2 seconds
-                    setTimeout(() => {
-                        this.textContent = originalText;
-                        this.classList.remove('bg-green-600', 'hover:bg-green-700');
-                        this.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                    }, 2000);
-                } else {
-                    alert('Failed to add to cart: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while adding to cart');
-            });
-        });
+        });        // Removed cart functionality as we're using orders instead
 
         // If the book has multiple images, we would load them here
         // This is just a placeholder for that functionality

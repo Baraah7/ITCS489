@@ -1,0 +1,87 @@
+<?php
+require_once __DIR__ . '/../models/user_model.php';
+
+class UserController {
+    private $db;
+
+    public function __construct($db) {
+        $this->db = $db;
+        // Start the session if it's not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
+
+    public function login() {
+        include __DIR__ . '/../views/user/login.php';
+    }
+
+    public function authenticate($email, $password) {
+        $user = User::authenticate($email, $password);
+        if ($user) {            // Set user session data
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['name'];
+            $_SESSION['is_admin'] = $user['is_admin'];
+            
+            // Convert guest order if exists
+            $this->convertGuestOrder($user['id']);
+            
+            // Redirect to home page
+            header('Location: index.php');
+            exit;
+        } else {
+            $_SESSION['error'] = 'Invalid email or password';
+            header('Location: index.php?route=login');
+            exit;
+        }
+    }    public function logout() {
+        // Clear all session data except guest order
+        $guestOrder = $_SESSION['guest_order'] ?? null;
+        session_destroy();
+        session_start();
+        if ($guestOrder) {
+            $_SESSION['guest_order'] = $guestOrder;
+        }
+        
+        // Redirect to home page
+        header('Location: index.php');
+        exit;
+    }
+
+    private function convertGuestOrder($userId) {
+        if (isset($_SESSION['guest_order']) && !empty($_SESSION['guest_order']['items'])) {
+            try {
+                // Create new order
+                $orderId = $this->orderModel->create([
+                    'user_id' => $userId
+                ]);
+
+                // Add items from guest order
+                foreach ($_SESSION['guest_order']['items'] as $item) {
+                    $this->orderItemModel->addItem([
+                        'order_id' => $orderId,
+                        'book_id' => $item['book_id'],
+                        'quantity' => $item['quantity'],
+                        'price' => $item['price']
+                    ]);
+                }
+
+                // Clear guest order
+                unset($_SESSION['guest_order']);
+                $_SESSION['success'] = 'Your guest order has been added to your account!';
+            } catch (Exception $e) {
+                $_SESSION['error'] = 'Error converting guest order: ' . $e->getMessage();
+            }
+        }
+    }
+
+    public function register() {
+        include 'views/users/register.php';
+    }
+
+    public function store($data) {
+        User::create($data);
+        header('Location: index.php?controller=user&action=login');
+    }
+}
+?>
