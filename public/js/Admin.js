@@ -14,10 +14,8 @@ add.addEventListener("click", () => showSection(AddContent));
 remove.addEventListener("click", () => showSection(RemoveContent));
 
 function showSection(sectionToShow) {
-
     const allSections = [homeContent, editContent, AddContent, RemoveContent];
     allSections.forEach(section => section.style.display = "none");
-
     sectionToShow.style.display = "flex";
 }
 
@@ -30,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const price = document.getElementById("add-price").value;
     const stock = document.getElementById("add-stock").value;
 
-    fetch("index.php?controller=book&action=add", {
+    fetch("index.php?controller=book&action=apiAdd", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, author, price, stock })
@@ -49,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const price = document.getElementById("edit-price").value;
     const stock = document.getElementById("edit-stock").value;
 
-    fetch("index.php?controller=book&action=edit", {
+    fetch("index.php?controller=book&action=apiEdit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, title, author, price, stock })
@@ -69,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    fetch("index.php?controller=book&action=delete", {
+    fetch("index.php?controller=book&action=apiDelete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id })
@@ -88,20 +86,18 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    fetch(`index.php?controller=book&action=getBookById&id=${id}`)
+    fetch(`index.php?controller=book&action=apiGetBookById&id=${id}`)
       .then(res => res.json())
       .then(book => {
-        if (book) {
+        if (book && !book.error) {
           document.getElementById("edit-title").value = book.title || "";
           document.getElementById("edit-author").value = book.author || "";
           document.getElementById("edit-price").value = book.price || "";
           document.getElementById("edit-stock").value = book.stock || "";
         } else {
-          alert("Book not found.");
+          alert(book.error || "Book not found.");
         }
       })
       .catch(err => alert("Error fetching book data"));
   });
 });
-
-
