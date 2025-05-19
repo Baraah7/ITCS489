@@ -33,24 +33,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td data-label="Book ID">1</td>
-                        <td data-label="Title">The Great Gatsby</td>
-                        <td data-label="Sold">10</td>
-                        <td data-label="Profit">109.9</td>
-                    </tr>
-                    <tr>
-                        <td data-label="Book ID">2</td>
-                        <td data-label="Title">1984</td>
-                        <td data-label="Sold">10</td>
-                        <td data-label="Profit">95.0</td>
-                    </tr>
+                    <?php if (isset($books) && is_array($books)): ?>
+                        <?php foreach ($books as $book): ?>
+                            <tr>
+                                <td data-label="Book ID"><?php echo htmlspecialchars($book['id']); ?></td>
+                                <td data-label="Title"><?php echo htmlspecialchars($book['title']); ?></td>
+                                <td data-label="Sold"><?php echo htmlspecialchars($book['sold']); ?></td>
+                                <td data-label="Profit"><?php echo htmlspecialchars($book['profit']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr><td colspan="4">No sales data available.</td></tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
 
         <div class="Edit-content">
-            
             <form id="input-form" class="form-container">
                 <div class="form-group">
                     <label for="find">Book ID</label>
@@ -103,7 +102,6 @@
                     <label for="author">Author</label>
                     <input type="text" id="add-author" placeholder="Enter author's name">
                 </div>
-
 
                 <div class="form-group">
                     <label for="price">Price</label>
