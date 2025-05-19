@@ -1,10 +1,11 @@
-<?php
+<?php 
+
 require_once __DIR__ . '/../models/user_model.php';
 
 class UserController {
     private $db;
 
-    public function __construct($db) {
+    public function __construct($db = null) {
         $this->db = $db;
         // Start the session if it's not already started
         if (session_status() === PHP_SESSION_NONE) {
@@ -16,9 +17,37 @@ class UserController {
         include __DIR__ . '/../views/user/login.php';
     }
 
+    // API endpoint for AJAX login (expects JSON, returns JSON)
+    public function apiAuthenticate() {
+        // Get JSON input
+        $input = json_decode(file_get_contents('php://input'), true);
+        $username = $input['username'] ?? '';
+        $password = $input['password'] ?? '';
+
+        $user = User::authenticate($username, $password);
+
+        header('Content-Type: application/json');
+        if ($user) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['name'];
+            $_SESSION['is_admin'] = $user['is_admin'];
+            echo json_encode([
+                'success' => true,
+                'role' => $user['is_admin'] ? 'admin' : 'user'
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Invalid username or password'
+            ]);
+        }
+        exit;
+    }
+
     public function authenticate($email, $password) {
         $user = User::authenticate($email, $password);
-        if ($user) {            // Set user session data
+        if ($user) {
+            // Set user session data
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['is_admin'] = $user['is_admin'];
@@ -34,7 +63,9 @@ class UserController {
             header('Location: index.php?route=login');
             exit;
         }
-    }    public function logout() {
+    }
+
+    public function logout() {
         // Clear all session data except guest order
         $guestOrder = $_SESSION['guest_order'] ?? null;
         session_destroy();
