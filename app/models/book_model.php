@@ -70,24 +70,33 @@ class book_model {
         $query = "DELETE FROM books WHERE id = ?";
         $stmt = $this->db->prepare($query);
         return $stmt->execute([$id]);
-    }
-
-    public function searchBooks($query = '', $category = '', $author = '', $minPrice = null, $maxPrice = null, $year = null, $sort = 'relevance') {
+    }    public function searchBooks($query = '', $category = '', $author = '', $minPrice = null, $maxPrice = null, $year = null, $sort = 'relevance') {
         $conditions = [];
         $params = [];
         $orderBy = '';
 
         // Base query with DISTINCT to prevent duplicates
-        $sql = "SELECT DISTINCT b.id, b.title, b.author, b.description, b.price, b.rating, b.cover_image, 
-                       b.created_at as publication_date, c.name as category 
+        $sql = "SELECT DISTINCT b.*, 
+                       c.name as category,
+                       CASE 
+                           WHEN b.title LIKE ? THEN 3
+                           WHEN b.author LIKE ? THEN 2
+                           WHEN b.description LIKE ? THEN 1
+                           ELSE 0
+                       END as relevance_score
                 FROM books b 
                 LEFT JOIN categories c ON b.category_id = c.id
                 WHERE b.title IS NOT NULL"; // Ensure we get only valid entries
 
-        // Add search conditions
+        // Always add search term parameters for relevance scoring
+        $searchTerm = empty($query) ? '%' : "%$query%";
+        $params[] = $searchTerm;
+        $params[] = $searchTerm;
+        $params[] = $searchTerm;
+
+        // Add search condition if query is not empty
         if (!empty($query)) {
-            $conditions[] = "(b.title LIKE ? OR b.description LIKE ? OR b.author LIKE ?)";
-            $searchTerm = "%$query%";
+            $conditions[] = "(b.title LIKE ? OR b.author LIKE ? OR b.description LIKE ?)";
             $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;
@@ -111,17 +120,24 @@ class book_model {
         if (!empty($maxPrice)) {
             $conditions[] = "b.price <= ?";
             $params[] = $maxPrice;
-        }
-
-        if (!empty($year)) {
+        }        if (!empty($year)) {
             $conditions[] = "YEAR(b.created_at) = ?";
             $params[] = $year;
+        }
+
+        // Validate price range
+        if (!empty($minPrice) && !empty($maxPrice) && $minPrice > $maxPrice) {
+            throw new Exception('Minimum price cannot be greater than maximum price');
         }
 
         // Add WHERE clause if there are conditions
         if (!empty($conditions)) {
             $sql .= " AND " . implode(" AND ", $conditions);
         }
+
+        // Debug info
+        error_log("Search conditions: " . print_r($conditions, true));
+        error_log("Search parameters: " . print_r($params, true));
 
         // Add ORDER BY clause
         switch ($sort) {

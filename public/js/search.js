@@ -171,6 +171,40 @@ document.addEventListener('DOMContentLoaded', function() {
         `).join('');
 
         setupPagination(books.length);
+    }    // Function to collect all search parameters
+    function getSearchParams() {
+        return {
+            q: searchInput?.value?.trim() || '',
+            category: categoryFilter?.value?.trim() || '',
+            author: authorFilter?.value?.trim() || '',
+            minPrice: parseFloat(minPrice?.value) || '',
+            maxPrice: parseFloat(maxPrice?.value) || '',
+            year: parseInt(yearFilter?.value) || '',
+            sort: sortBy?.value || 'relevance'
+        };
+    }
+
+    // Function to validate price range
+    function validatePriceRange() {
+        const min = parseFloat(minPrice?.value);
+        const max = parseFloat(maxPrice?.value);
+        
+        if (!isNaN(min) && !isNaN(max) && min > max) {
+            showNotification('Minimum price cannot be greater than maximum price', 'error');
+            return false;
+        }
+        return true;
+    }
+
+    // Function to reset all filters
+    function resetFilters() {
+        if (searchInput) searchInput.value = '';
+        if (categoryFilter) categoryFilter.value = '';
+        if (authorFilter) authorFilter.value = '';
+        if (minPrice) minPrice.value = '';
+        if (maxPrice) maxPrice.value = '';
+        if (yearFilter) yearFilter.value = '';
+        if (sortBy) sortBy.value = 'relevance';
     }
 
     // Perform search with current filters
@@ -181,17 +215,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            const searchParams = {
-                q: searchTerm || searchInput?.value || '',
-                category: categoryFilter?.value || '',
-                author: authorFilter?.value || '',
-                minPrice: minPrice?.value || '',
-                maxPrice: maxPrice?.value || '',
-                year: yearFilter?.value || '',
-                sort: sortBy?.value || 'relevance'
-            };
+            if (!validatePriceRange()) return;
+
+            const searchParams = getSearchParams();
+            if (searchTerm !== undefined) {
+                searchParams.q = searchTerm;
+            }
             
-            resultsContainer.innerHTML = '<div class="loading">Loading...</div>';
+            resultsContainer.innerHTML = `
+                <div class="col-span-full flex justify-center items-center py-12">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2A3F5F]"></div>
+                </div>
+            `;
+            
             const books = await fetchBooks(searchParams);
             displayBooks(books);
         } catch (error) {
@@ -393,16 +429,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 performSearch();
             }
         });
-    }
-
+    }    // Event listeners for filters
     if (sortBy) {
-        sortBy.addEventListener('change', performSearch);
+        sortBy.addEventListener('change', () => performSearch());
     }
 
     if (categoryFilter) {
-        categoryFilter.addEventListener('change', performSearch);
+        categoryFilter.addEventListener('change', () => performSearch());
     }
 
+    // Advanced search toggle
     if (advancedSearchToggle) {
         advancedSearchToggle.addEventListener('click', function() {
             if (advancedSearch) {
@@ -419,6 +455,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+    }
+
+    // Reset filters button
+    const resetFiltersBtn = document.getElementById('reset-filters');
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', () => {
+            resetFilters();
+            performSearch();
+        });
+    }
+
+    // Apply filters button
+    const applyFiltersBtn = document.getElementById('apply-filters');
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', () => performSearch());
+    }
+
+    // Price range validation
+    if (minPrice && maxPrice) {
+        minPrice.addEventListener('change', validatePriceRange);
+        maxPrice.addEventListener('change', validatePriceRange);
     }
 
     // Event listeners for pagination
