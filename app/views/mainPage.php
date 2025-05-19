@@ -1,34 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baghdad Library</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Arial:wght@400;500;700&display=swap');
-        
-        body {
-            font-family: 'Arial', sans-serif;
-        }
-    </style>
-</head>
-<body class="bg-[#FFF9F4]">
-    <div class="max-w-screen-xl mx-auto w-full px-4">
-        <!-- Header -->
-        <header class="bg-white shadow-md">
-            <div class="header-top px-8 py-6">
-                <div class="flex justify-between items-center mb-6">                    <div class="text-left">
-                        <h1 class="text-5xl font-bold text-[#2A3F5F] mb-2">Baghdad</h1>
-                        <p class="subtitle text-[#6B778C] text-lg font-normal">Your go to library of endless, wonderful knowledge</p>
-                    </div>                    <div class="flex items-center space-x-4">
-                        <form id="searchForm" action="/ITCS489/public/index.php" method="GET" class="relative flex items-center">
-                            <input type="hidden" name="route" value="search">
-                            <input type="text" name="q" placeholder="Search books..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#2A3F5F] w-64" required>
-                            <button type="submit" class="absolute left-3 text-[#2A3F5F] hover:text-opacity-70" title="Search">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
+<?php 
+$pageTitle = 'Baghdad Library - Home';
+include __DIR__ . '/layout/header.php';
+?>
+
+<div class="max-w-screen-xl mx-auto w-full px-4">
+    <!-- Welcome Section -->
+    <header class="bg-white shadow-md mt-4">
+        <div class="header-top px-8 py-6">
+            <div class="flex justify-between items-center mb-6">
+                <div class="text-left">
+                    <h1 class="text-5xl font-bold text-[#2A3F5F] mb-2">Welcome to Baghdad</h1>
+                    <p class="subtitle text-[#6B778C] text-lg font-normal">Your go to library of endless, wonderful knowledge</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <form id="searchForm" action="/ITCS489/public/index.php" method="GET" class="relative flex items-center">
+                        <input type="hidden" name="route" value="search">
+                        <input type="text" name="q" placeholder="Search books..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#2A3F5F] w-64" required>
+                        <button type="submit" class="absolute left-3 text-[#2A3F5F] hover:text-opacity-70" title="Search">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
                             </button>
                         </form>
                         <a href="#login" class="px-6 py-2 bg-[#2A3F5F] text-white rounded-full hover:opacity-90">Log In</a>
@@ -248,7 +239,5 @@
                     <p>&copy; 2023 Baghdad Library. All rights reserved.</p>
                 </div>
             </div>
-        </footer>
-    </div>
-</body>
-</html>
+        </footer>    </div>
+<?php include __DIR__ . '/layout/footer.php'; ?>
