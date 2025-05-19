@@ -1,23 +1,3 @@
-// Function to perform search
-async function performSearch(searchTerm) {
-    if (!searchInput || !resultsContainer) {
-        console.error('Required DOM elements not found');
-        return;
-    }
-    const searchParams = {
-        q: searchTerm || searchInput.value || '',
-        category: categoryFilter?.value || '',
-        author: authorFilter?.value || '',
-        minPrice: minPrice?.value || '',
-        maxPrice: maxPrice?.value || '',
-        year: yearFilter?.value || '',
-        sort: sortBy?.value || 'relevance'
-    };
-    
-    const books = await fetchBooks(searchParams);
-    displayBooks(books);
-}
-
 // Debug to verify script is loading
 console.log('Search script loaded!');
 
@@ -177,78 +157,101 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Perform search with current filters
-    async function performSearch() {
-        console.log('Performing search...');
-        const searchParams = {
-            q: searchInput?.value || '',
-            category: categoryFilter?.value || '',
-            author: authorFilter?.value || '',
-            minPrice: minPrice?.value || '',
-            maxPrice: maxPrice?.value || '',
-            year: yearFilter?.value || '',
-            sort: sortBy?.value || 'relevance'
-        };
+    async function performSearch(searchTerm) {
+        if (!resultsContainer) {
+            showNotification('Error: Results container not found. Please refresh the page.', 'error');
+            return;
+        }
 
-        console.log('Search parameters:', searchParams);
-        const books = await fetchBooks(searchParams);
-        displayBooks(books);
-    }    // Function to show notification
-    function showNotification(response, isSuccess = true) {
+        try {
+            const searchParams = {
+                q: searchTerm || searchInput?.value || '',
+                category: categoryFilter?.value || '',
+                author: authorFilter?.value || '',
+                minPrice: minPrice?.value || '',
+                maxPrice: maxPrice?.value || '',
+                year: yearFilter?.value || '',
+                sort: sortBy?.value || 'relevance'
+            };
+            
+            resultsContainer.innerHTML = '<div class="loading">Loading...</div>';
+            const books = await fetchBooks(searchParams);
+            displayBooks(books);
+        } catch (error) {
+            console.error('Search error:', error);
+            showNotification('An error occurred while searching. Please try again.', 'error');
+            resultsContainer.innerHTML = '<div class="error">An error occurred while searching. Please try again.</div>';
+        }
+    }
+
+    // Function to show notification
+    function showNotification(message, type = 'info') {
+        // Remove any existing notifications
+        const existingNotifications = document.querySelectorAll('.notification-overlay');
+        existingNotifications.forEach(notification => notification.remove());
+
         // Create overlay
         const overlay = document.createElement('div');
-        overlay.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
-        overlay.style.opacity = '0';
-        overlay.style.transition = 'opacity 0.3s ease-in-out';
+        overlay.className = 'notification-overlay fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
 
-        // Create notification
+        // Create notification container
         const notification = document.createElement('div');
-        // Handle both string messages and JSON responses
-        let message = typeof response === 'string' ? response : 
-                     response.message ? response.message :
-                     response.success ? 'Operation successful' : 
-                     response.error || 'Unknown error occurred';
-        
-        notification.className = `bg-white rounded-lg shadow-2xl p-6 max-w-md w-full mx-4 transform scale-95 opacity-0 transition-all duration-300`;
-        notification.innerHTML = `
-            <div class="text-center mb-4">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full ${isSuccess ? 'bg-green-100' : 'bg-red-100'} mb-4">
-                    <i class="fas ${isSuccess ? 'fa-check' : 'fa-exclamation'} text-2xl ${isSuccess ? 'text-green-500' : 'text-red-500'}"></i>
-                </div>
-                <h3 class="text-lg font-semibold ${isSuccess ? 'text-green-800' : 'text-red-800'} mb-2">${isSuccess ? 'Success!' : 'Error'}</h3>
-                <p class="text-gray-600">${message}</p>
-            </div>
-            <div class="flex justify-center">
-                <button class="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors">
-                    Close
-                </button>
-            </div>
-        `;        overlay.appendChild(notification);
+        notification.className = `notification p-4 rounded-lg shadow-lg max-w-md w-full mx-4 relative 
+            ${type === 'error' ? 'bg-red-100 border-red-400 text-red-700' : 
+              type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 
+              'bg-blue-100 border-blue-400 text-blue-700'}`;
+
+        // Add icon based on type
+        const icon = document.createElement('span');
+        icon.className = 'absolute left-4 top-4';
+        icon.innerHTML = type === 'error' ? '❌' : 
+                        type === 'success' ? '✅' : 
+                        'ℹ️';
+
+        // Add message
+        const messageElement = document.createElement('div');
+        messageElement.className = 'ml-8 mr-8';
+        messageElement.textContent = message;
+
+        // Add close button
+        const closeButton = document.createElement('button');
+        closeButton.className = 'absolute right-2 top-2 text-gray-600 hover:text-gray-800';
+        closeButton.innerHTML = '×';
+        closeButton.onclick = () => overlay.remove();
+
+        // Assemble notification
+        notification.appendChild(icon);
+        notification.appendChild(messageElement);
+        notification.appendChild(closeButton);
+        overlay.appendChild(notification);
         document.body.appendChild(overlay);
 
-        // Animate in
-        requestAnimationFrame(() => {
-            overlay.style.opacity = '1';
-            notification.style.transform = 'scale(1)';
+        // Add fade-in animation
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateY(-20px)';
+        notification.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
+        
+        // Trigger animation
+        setTimeout(() => {
             notification.style.opacity = '1';
-        });
+            notification.style.transform = 'translateY(0)';
+        }, 10);
 
-        // Add click handlers
-        const closeNotification = () => {
-            overlay.style.opacity = '0';
-            notification.style.transform = 'scale(0.95)';
-            notification.style.opacity = '0';
-            setTimeout(() => overlay.remove(), 300);
-        };
+        // Auto-dismiss after 3 seconds
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-20px)';
+                setTimeout(() => overlay.remove(), 300);
+            }
+        }, 3000);
 
-        notification.querySelector('button').addEventListener('click', closeNotification);
+        // Close on click outside
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) {
-                closeNotification();
+                overlay.remove();
             }
         });
-
-        // Auto dismiss after 3 seconds
-        setTimeout(closeNotification, 3000);
     }
 
     // Function to update cart count

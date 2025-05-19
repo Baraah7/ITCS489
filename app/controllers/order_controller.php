@@ -1,17 +1,20 @@
 <?php
 require_once __DIR__ . '/../models/order_model.php';
 require_once __DIR__ . '/../models/orderItem_model.php';
+require_once __DIR__ . '/../models/orderDetails.php';
 require_once __DIR__ . '/../core/EmailHelper.php';
 
 class OrderController {
     private $db;
     private $orderModel;
     private $orderItemModel;
+    private $orderDetails;
 
     public function __construct($db) {
         $this->db = $db;
         $this->orderModel = new Order($db);
         $this->orderItemModel = new OrderItem($db);
+        $this->orderDetails = new orderDetails($db);
     }    public function index() {
         // Start session if not already started
         if (session_status() === PHP_SESSION_NONE) {
@@ -253,17 +256,33 @@ class OrderController {
 
         header('Location: /ITCS489/public/index.php?route=orders');
         exit;
-    }
-
-    public function guestCheckout() {
+    }    public function guestCheckout() {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
-        if (!isset($_SESSION['guest_order']) || empty($_SESSION['guest_order']['items'])) {
-            $_SESSION['error'] = 'No items in your order';
+        // Check if there's an order in session
+        if (!isset($_SESSION['guest_order']) || !isset($_SESSION['guest_order']['items'])) {
+            $_SESSION['error'] = 'No active order found. Please add items to your cart first.';
             header('Location: /ITCS489/public/index.php?route=orders');
             exit;
+        }
+
+        // Check if there are items in the order
+        if (empty($_SESSION['guest_order']['items'])) {
+            $_SESSION['error'] = 'Your cart is empty. Please add items before checking out.';
+            header('Location: /ITCS489/public/index.php?route=orders');
+            exit;
+        }
+
+        // Validate items in the order
+        foreach ($_SESSION['guest_order']['items'] as $item) {
+            if (!isset($item['book_id']) || !isset($item['quantity']) || $item['quantity'] < 1) {
+                $_SESSION['error'] = 'Invalid items in your cart. Please try adding them again.';
+                unset($_SESSION['guest_order']); // Clear invalid order
+                header('Location: /ITCS489/public/index.php?route=orders');
+                exit;
+            }
         }
 
         include __DIR__ . '/../views/checkout.php';
@@ -274,9 +293,46 @@ class OrderController {
             session_start();
         }
 
+        // Validate presence of guest order
         if (!isset($_SESSION['guest_order']) || empty($_SESSION['guest_order']['items'])) {
             $_SESSION['error'] = 'No items in your order';
             header('Location: /ITCS489/public/index.php?route=orders');
+            exit;
+        }
+
+        // Validate required fields
+        $requiredFields = ['email', 'phone', 'firstName', 'lastName', 'address', 'city', 'postalCode', 'country', 'paymentMethod'];
+        $missingFields = [];
+        foreach ($requiredFields as $field) {
+            if (!isset($_POST[$field]) || trim($_POST[$field]) === '') {
+                $missingFields[] = $field;
+            }
+        }
+
+        if (!empty($missingFields)) {
+            $_SESSION['error'] = 'Please fill in all required fields: ' . implode(', ', $missingFields);
+            header('Location: /ITCS489/public/index.php?route=order/checkout');
+            exit;
+        }
+
+        // Validate email format
+        if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['error'] = 'Please enter a valid email address';
+            header('Location: /ITCS489/public/index.php?route=order/checkout');
+            exit;
+        }
+
+        // Validate phone number (8 digits, optionally starting with +973)
+        if (!preg_match('/^(\+973)?[0-9]{8}$/', $_POST['phone'])) {
+            $_SESSION['error'] = 'Please enter a valid phone number (8 digits, optionally starting with +973)';
+            header('Location: /ITCS489/public/index.php?route=order/checkout');
+            exit;
+        }
+
+        // Validate postal code (3-4 digits for Bahrain)
+        if (!preg_match('/^[0-9]{3,4}$/', $_POST['postalCode'])) {
+            $_SESSION['error'] = 'Please enter a valid postal code (3-4 digits)';
+            header('Location: /ITCS489/public/index.php?route=order/checkout');
             exit;
         }
 
@@ -319,37 +375,44 @@ class OrderController {
             ");
 
             foreach ($_SESSION['guest_order']['items'] as $item) {
+                // Verify book still exists and get current price
+                $bookStmt = $this->db->prepare("SELECT price FROM books WHERE id = ?");
+                $bookStmt->execute([$item['book_id']]);
+                $book = $bookStmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$book) {
+                    throw new Exception('One or more books in your order are no longer available');
+                }
+
                 $stmt->execute([
                     $orderId,
                     $item['book_id'],
                     $item['quantity'],
-                    $item['price']
+                    $book['price'] // Use current price from database
                 ]);
             }
+
+            // Calculate and update order total
+            $this->updateOrderTotal($orderId);
 
             // Commit transaction
             $this->db->commit();
 
-            // Get order details for receipt
-            $stmt = $this->db->prepare("
-                SELECT o.*, oi.*, b.title, b.cover_image
-                FROM orders o
-                JOIN order_items oi ON o.id = oi.order_id
-                JOIN books b ON oi.book_id = b.id
-                WHERE o.id = ?
-            ");
-            $stmt->execute([$orderId]);
-            $orderDetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+            // Get order details for confirmation
+            $orderDetails = $this->getOrderDetails($orderId);
+            
             if (empty($orderDetails)) {
-                throw new Exception('Order details not found');
+                throw new Exception('Error retrieving order details');
             }
 
             // Clear guest order from session
             unset($_SESSION['guest_order']);
-
-            // Show receipt
-            include __DIR__ . '/../views/receipt.php';
+            
+            // Set success message
+            $_SESSION['success'] = 'Order placed successfully!';
+            
+            // Redirect to confirmation page
+            header("Location: /ITCS489/public/index.php?route=order/confirmation/{$orderId}");
             exit;
 
         } catch (Exception $e) {
@@ -359,7 +422,79 @@ class OrderController {
             }
             
             error_log('Order processing error: ' . $e->getMessage());
-            $_SESSION['error'] = 'An error occurred while processing your order. Please try again.';
+            $_SESSION['error'] = $e->getMessage();
+            header('Location: /ITCS489/public/index.php?route=order/checkout');
+            exit;
+        }
+    }
+
+    // Process checkout using new model
+    public function processNewCheckout() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['guest_order']) || empty($_SESSION['guest_order']['items'])) {
+            $_SESSION['error'] = 'No items in your order';
+            header('Location: /ITCS489/public/index.php?route=orders');
+            exit;
+        }
+
+        try {
+            $this->db->beginTransaction();
+
+            // Create order
+            $success = $this->orderDetails->createOrder(
+                null, // user_id for guest
+                $_POST['email'],
+                $_POST['phone'],
+                $_POST['firstName'],
+                $_POST['lastName'],
+                $_POST['address'],
+                $_POST['apartment'] ?? null,
+                $_POST['city'],
+                $_POST['postalCode'],
+                $_POST['country'],
+                $_POST['paymentMethod'],
+                'pending',
+                1 // is_guest
+            );
+
+            if (!$success) {
+                throw new Exception('Failed to create order');
+            }
+
+            $orderId = $this->db->lastInsertId();
+
+            // Add order items
+            foreach ($_SESSION['guest_order']['items'] as $item) {
+                $this->orderDetails->addOrderItem(
+                    $orderId,
+                    $item['book_id'],
+                    $item['quantity'],
+                    $item['price']
+                );
+            }
+
+            $this->db->commit();
+
+            // Get complete order details
+            $orderDetails = $this->orderDetails->getOrderWithItems($orderId);
+
+            // Clear guest order from session
+            unset($_SESSION['guest_order']);
+
+            // Set success message
+            $_SESSION['success'] = 'Order placed successfully!';
+            
+            // Redirect to confirmation page
+            header("Location: /ITCS489/public/index.php?route=order/confirmation/{$orderId}");
+            exit;
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            error_log('Order processing error: ' . $e->getMessage());
+            $_SESSION['error'] = $e->getMessage();
             header('Location: /ITCS489/public/index.php?route=order/checkout');
             exit;
         }
@@ -433,5 +568,57 @@ class OrderController {
             $activeOrder['items'] = $items;
         }
         return $activeOrder;
+    }
+
+    // Calculate and update order total
+    private function updateOrderTotal($orderId) {
+        try {
+            // Calculate subtotal from order items
+            $stmt = $this->db->prepare("
+                SELECT SUM(quantity * price) as subtotal
+                FROM order_items
+                WHERE order_id = ?
+            ");
+            $stmt->execute([$orderId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $subtotal = $result['subtotal'] ?? 0;
+
+            // Calculate shipping (free if subtotal >= 25)
+            $shipping = ($subtotal >= 25) ? 0 : 5.99;
+
+            // Calculate tax (8%)
+            $tax = $subtotal * 0.08;
+
+            // Calculate total
+            $total = $subtotal + $shipping + $tax;
+
+            // Update order with total amount
+            $stmt = $this->db->prepare("
+                UPDATE orders 
+                SET total = ?
+                WHERE id = ?
+            ");
+            return $stmt->execute([$total, $orderId]);
+        } catch (Exception $e) {
+            error_log("Error updating order total: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function getOrderDetails($orderId) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT o.*, oi.*, b.title, b.cover_image
+                FROM orders o
+                JOIN order_items oi ON o.id = oi.order_id
+                JOIN books b ON oi.book_id = b.id
+                WHERE o.id = ?
+            ");
+            $stmt->execute([$orderId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("Error getting order details: " . $e->getMessage());
+            return [];
+        }
     }
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 18, 2025 at 03:54 PM
+-- Generation Time: May 19, 2025 at 10:11 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -131,18 +131,60 @@ INSERT INTO `categories` (`id`, `name`) VALUES
 CREATE TABLE `orders` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `first_name` varchar(100) DEFAULT NULL,
+  `last_name` varchar(100) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `apartment` varchar(100) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `postal_code` varchar(20) DEFAULT NULL,
+  `country` varchar(100) DEFAULT NULL,
   `order_date` datetime DEFAULT current_timestamp(),
+  `payment_method` varchar(50) DEFAULT NULL,
   `total` decimal(10,2) DEFAULT NULL,
-  `status` enum('pending','paid','shipped','cancelled') DEFAULT 'pending'
+  `status` enum('pending','paid','shipped','cancelled') DEFAULT 'pending',
+  `is_guest` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `order_date`, `total`, `status`) VALUES
-(1, 1, '2025-05-17 15:54:45', 21.98, 'paid'),
-(2, 2, '2025-05-17 15:54:45', 10.99, 'pending');
+INSERT INTO `orders` (`id`, `user_id`, `email`, `phone`, `first_name`, `last_name`, `address`, `apartment`, `city`, `postal_code`, `country`, `order_date`, `payment_method`, `total`, `status`, `is_guest`) VALUES
+(1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-05-17 15:54:45', NULL, 21.98, 'paid', 0),
+(2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-05-17 15:54:45', NULL, 10.99, 'pending', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orders_new`
+--
+
+CREATE TABLE `orders_new` (
+  `order_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `first_name` varchar(100) DEFAULT NULL,
+  `last_name` varchar(100) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `apartment` varchar(100) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `postal_code` varchar(20) DEFAULT NULL,
+  `country` varchar(100) DEFAULT NULL,
+  `payment_method` varchar(50) DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `is_guest` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `orders_new`
+--
+
+INSERT INTO `orders_new` (`order_id`, `user_id`, `email`, `phone`, `first_name`, `last_name`, `address`, `apartment`, `city`, `postal_code`, `country`, `payment_method`, `status`, `is_guest`) VALUES
+(1, 1, 'alice@example.com', '123-456-7890', 'Alice', 'Johnson', '123 Main St', 'Apt 4B', 'Some City', '12345', 'Some Country', 'Credit Card', 'Processing', 0),
+(2, NULL, 'guest@example.com', '987-654-3210', 'John', 'Doe', '456 Guest St', 'Apt 12A', 'Guest City', '67890', 'Some Country', 'PayPal', 'Pending', 1);
 
 -- --------------------------------------------------------
 
@@ -224,6 +266,12 @@ ALTER TABLE `orders`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `orders_new`
+--
+ALTER TABLE `orders_new`
+  ADD PRIMARY KEY (`order_id`);
+
+--
 -- Indexes for table `order_items`
 --
 ALTER TABLE `order_items`
@@ -259,6 +307,12 @@ ALTER TABLE `categories`
 --
 ALTER TABLE `orders`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `orders_new`
+--
+ALTER TABLE `orders_new`
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `order_items`
