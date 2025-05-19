@@ -14,7 +14,7 @@ class UserController {
     }
 
     public function login() {
-        include __DIR__ . '/../views/user/login.php';
+        include __DIR__ . '/../views/Login.php';
     }
 
     // API endpoint for AJAX login (expects JSON, returns JSON)
