@@ -27,6 +27,11 @@ class BookController {
         header('Location: index.php?controller=book&action=index');
     }
 
+    public function adminDashboard() {
+        $books = $this->bookModel->getRecentSales(5);
+        include __DIR__ . '/../views/Admin.php';
+    }
+
     public function edit($id) {
         $book = $this->bookModel->getBookById($id);
         include 'views/books/edit.php';
