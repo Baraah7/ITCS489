@@ -22,8 +22,8 @@ include __DIR__ . '/layout/header.php';
                             </svg>
                             </button>
                         </form>
-                        <a href="#login" class="px-6 py-2 bg-[#2A3F5F] text-white rounded-full hover:opacity-90">Log In</a>
-                        <a href="#about" class="button secondary px-6 py-2 bg-[#E8E9EB] text-[#2A3F5F] rounded-full hover:bg-gray-300">About Us</a>
+                        <a href="index.php?controller=user&action=login" class="px-6 py-2 bg-[#2A3F5F] text-white rounded-full hover:opacity-90">Log In</a>
+                        <a href="index.php?controller=user&action=register" class="button secondary px-6 py-2 bg-[#E8E9EB] text-[#2A3F5F] rounded-full hover:bg-gray-300">Sign Up</a>
                     </div>
                 </div>
                 <div class="nav-bar flex justify-center space-x-8 text-[#495057] font-medium border-t border-[#dee2e6] pt-4">
