@@ -30,6 +30,49 @@ switch ($route) {
         include __DIR__ . '/../app/views/search.php';
         break;
 
+    // Order routes
+    case 'orders':
+        $orderController->index();
+        break;
+
+    case 'order/count':
+        $orderController->getCartCount();
+        break;    case 'order/add':
+        $orderController->addToOrder();
+        break;
+
+    case 'order/count':
+        $orderController->getCartCount();
+        break;
+
+    case 'order/update':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $orderController->updateGuestOrder();
+        } else {
+            header('Location: index.php?route=orders');
+        }
+        break;
+
+    case 'order/remove':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $orderController->removeFromGuestOrder();
+        } else {
+            header('Location: index.php?route=orders');
+        }
+        break;
+
+    case 'order/checkout':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $orderController->processCheckout();
+        } else {
+            $orderController->guestCheckout();
+        }
+        break;
+
+    case (preg_match('/^order\/confirmation\/(\d+)$/', $route, $matches) ? true : false):
+        $orderController->showConfirmation($matches[1]);
+        break;
+
     // Book routes
     case 'books':
         $bookController->index();
@@ -39,6 +82,8 @@ switch ($route) {
         $id = $_GET['id'] ?? null;
         if ($id) {
             $bookController->show($id);
+        } else {
+            header('Location: /ITCS489/public/index.php');
         }
         break;
     
@@ -78,47 +123,6 @@ switch ($route) {
         if ($id) {
             $bookController->delete($id);
         }        break;
-
-    // Order routes
-    case 'orders':
-        $orderController->index();
-        break;
-
-    case 'order/add':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $orderController->addToOrder();
-        } else {
-            header('Location: index.php?route=home');
-        }
-        break;
-
-    case 'order/update':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $orderController->updateGuestOrder();
-        } else {
-            header('Location: index.php?route=orders');
-        }
-        break;
-
-    case 'order/remove':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $orderController->removeFromGuestOrder();
-        } else {
-            header('Location: index.php?route=orders');
-        }
-        break;
-
-    case 'order/checkout':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $orderController->processCheckout();
-        } else {
-            $orderController->guestCheckout();
-        }
-        break;
-
-    case (preg_match('/^order\/confirmation\/(\d+)$/', $route, $matches) ? true : false):
-        $orderController->showConfirmation($matches[1]);
-        break;
 
     // User routes
     case 'login':

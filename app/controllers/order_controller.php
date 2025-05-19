@@ -66,7 +66,6 @@ class OrderController {
         Order::delete($id);
         header('Location: index.php?controller=order&action=index');
     }    public function addToOrder() {
-        // Start session if not already started
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -74,12 +73,26 @@ class OrderController {
         // Get book_id and quantity from POST data
         $book_id = $_POST['book_id'] ?? null;
         $quantity = intval($_POST['quantity'] ?? 1);
+        
+        // Check if this is an AJAX request
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
         if (!$book_id || $quantity < 1) {
-            $_SESSION['error'] = 'Invalid book or quantity';
-            header('Location: ' . $_SERVER['HTTP_REFERER']);
-            exit;
-        }        try {
+            if ($isAjax) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Invalid book or quantity'
+                ]);
+                exit;
+            } else {
+                $_SESSION['error'] = 'Invalid book or quantity';
+                header('Location: ' . $_SERVER['HTTP_REFERER'] ?? '/ITCS489/public/index.php');
+                exit;
+            }
+        }
+
+        try {
             // If user is not logged in, store in session
             if (!isset($_SESSION['user_id'])) {
                 if (!isset($_SESSION['guest_order'])) {
@@ -101,15 +114,30 @@ class OrderController {
 
                 if (!$found) {
                     // Get book details
-                    $stmt = $this->db->prepare("SELECT title, price FROM books WHERE id = ?");
+                    $stmt = $this->db->prepare("SELECT title, price, cover_image FROM books WHERE id = ?");
                     $stmt->execute([$book_id]);
                     $book = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if (!$book) {
+                        if ($isAjax) {
+                            echo json_encode([
+                                'success' => false,
+                                'message' => 'Book not found'
+                            ]);
+                            exit;
+                        } else {
+                            $_SESSION['error'] = 'Book not found';
+                            header('Location: ' . $_SERVER['HTTP_REFERER'] ?? '/ITCS489/public/index.php');
+                            exit;
+                        }
+                    }
 
                     $_SESSION['guest_order']['items'][] = [
                         'book_id' => $book_id,
                         'quantity' => $quantity,
                         'price' => $book['price'],
-                        'title' => $book['title']
+                        'title' => $book['title'],
+                        'cover_image' => $book['cover_image']
                     ];
                 }
             } else {
@@ -133,13 +161,44 @@ class OrderController {
                 ]);
             }
 
-            $_SESSION['success'] = 'Book added to your order successfully!';
-        } catch (Exception $e) {
-            $_SESSION['error'] = 'Error adding book to order: ' . $e->getMessage();
-        }
+            // Get the updated cart count
+            $cartCount = 0;
+            if (!isset($_SESSION['user_id'])) {
+                foreach ($_SESSION['guest_order']['items'] as $item) {
+                    $cartCount += $item['quantity'];
+                }
+            } else {
+                $activeOrder = $this->orderModel->getActiveOrderByUser($_SESSION['user_id']);
+                if ($activeOrder) {
+                    $orderItems = $this->orderItemModel->getByOrder($activeOrder['id']);
+                    foreach ($orderItems as $item) {
+                        $cartCount += $item['quantity'];
+                    }
+                }
+            }
 
-        // Redirect back to the book page
-        header('Location: ' . $_SERVER['HTTP_REFERER']);
+            if ($isAjax) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Book added to cart successfully',
+                    'count' => $cartCount
+                ]);
+            } else {
+                $_SESSION['success'] = 'Book added to cart successfully';
+                header('Location: ' . $_SERVER['HTTP_REFERER'] ?? '/ITCS489/public/index.php');
+            }
+            
+        } catch (Exception $e) {
+            if ($isAjax) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Error adding book to cart: ' . $e->getMessage()
+                ]);
+            } else {
+                $_SESSION['error'] = 'Error adding book to cart: ' . $e->getMessage();
+                header('Location: ' . $_SERVER['HTTP_REFERER'] ?? '/ITCS489/public/index.php');
+            }
+        }
         exit;
     }
 
@@ -221,16 +280,6 @@ class OrderController {
             exit;
         }
 
-        // Validate required fields
-        $required_fields = ['email', 'phone', 'firstName', 'lastName', 'address', 'city', 'postalCode', 'country'];
-        foreach ($required_fields as $field) {
-            if (!isset($_POST[$field]) || empty($_POST[$field])) {
-                $_SESSION['error'] = 'Please fill in all required fields';
-                header('Location: /ITCS489/public/index.php?route=order/checkout');
-                exit;
-            }
-        }
-
         try {
             // Start transaction
             $this->db->beginTransaction();
@@ -276,10 +325,12 @@ class OrderController {
                     $item['quantity'],
                     $item['price']
                 ]);
-            }            // Commit transaction
+            }
+
+            // Commit transaction
             $this->db->commit();
 
-            // Get order details for email
+            // Get order details for receipt
             $stmt = $this->db->prepare("
                 SELECT o.*, oi.*, b.title, b.cover_image
                 FROM orders o
@@ -290,30 +341,28 @@ class OrderController {
             $stmt->execute([$orderId]);
             $orderDetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Send confirmation email
-            if (!EmailHelper::sendOrderConfirmation($orderDetails)) {
-                error_log("Failed to send confirmation email for order " . $orderId);
+            if (empty($orderDetails)) {
+                throw new Exception('Order details not found');
             }
 
             // Clear guest order from session
             unset($_SESSION['guest_order']);
 
-            // Set success message
-            $_SESSION['success'] = 'Order placed successfully! A confirmation email has been sent to your inbox.';
-            header('Location: /ITCS489/public/index.php?route=order/confirmation/' . $orderId);
+            // Show receipt
+            include __DIR__ . '/../views/receipt.php';
             exit;
 
         } catch (Exception $e) {
             // Rollback on error
-            $this->db->rollBack();
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            
+            error_log('Order processing error: ' . $e->getMessage());
             $_SESSION['error'] = 'An error occurred while processing your order. Please try again.';
             header('Location: /ITCS489/public/index.php?route=order/checkout');
             exit;
         }
-
-        // Send confirmation email
-        $emailHelper = new EmailHelper();
-        $emailHelper->sendOrderConfirmation($_POST['email'], $orderId, $_SESSION['guest_order']['items']);
     }
 
     public function showConfirmation($orderId) {
@@ -337,5 +386,52 @@ class OrderController {
         }
 
         include __DIR__ . '/../views/order_confirmation.php';
+    }
+
+    public function getCartCount() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        header('Content-Type: application/json');
+
+        $count = 0;
+        
+        if (!isset($_SESSION['user_id'])) {
+            // For guest users
+            if (isset($_SESSION['guest_order']) && !empty($_SESSION['guest_order']['items'])) {
+                foreach ($_SESSION['guest_order']['items'] as $item) {
+                    $count += $item['quantity'];
+                }
+            }
+        } else {
+            // For logged-in users, get active order count
+            try {
+                $activeOrder = $this->orderModel->getActiveOrderByUser($_SESSION['user_id']);
+                if ($activeOrder) {
+                    $items = $this->orderItemModel->getByOrder($activeOrder['id']);
+                    foreach ($items as $item) {
+                        $count += $item['quantity'];
+                    }
+                }
+            } catch (Exception $e) {
+                error_log("Error getting cart count: " . $e->getMessage());
+            }
+        }
+
+        echo json_encode([
+            'success' => true,
+            'count' => $count
+        ]);
+        exit;
+    }
+
+    public function getActiveUserOrder() {
+        $activeOrder = $this->orderModel->getActiveOrderByUser($_SESSION['user_id']);
+        if ($activeOrder) {
+            $items = $this->orderItemModel->getByOrder($activeOrder['id']);
+            $activeOrder['items'] = $items;
+        }
+        return $activeOrder;
     }
 }

@@ -58,9 +58,14 @@ class Order {
         }
 
         return $orders;
-    }public function getActiveOrderByUser($user_id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM orders WHERE user_id = ? AND status = 'pending' ORDER BY order_date DESC LIMIT 1");
-        $stmt->execute([$user_id]);
+    }public function getActiveOrderByUser($userId) {
+        $stmt = $this->pdo->prepare("
+            SELECT * FROM orders 
+            WHERE user_id = ? AND status = 'pending'
+            ORDER BY created_at DESC 
+            LIMIT 1
+        ");
+        $stmt->execute([$userId]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 

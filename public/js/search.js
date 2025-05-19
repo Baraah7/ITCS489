@@ -141,10 +141,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 pagination.classList.add('hidden');
             }
             return;
-        }
-
-        resultsContainer.innerHTML = paginatedBooks.map(book => `
-            <div class="rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow" style="background-color: #D0B8A8">
+        }        resultsContainer.innerHTML = paginatedBooks.map(book => `
+            <div class="book-card rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
+                 style="background-color: #D0B8A8"
+                 data-id="${book.id}"
+                 onclick="if (!event.target.closest('.add-to-cart')) window.location.href='/ITCS489/public/index.php?route=book/show&id=${book.id}'">
                 <div class="relative pb-48 overflow-hidden">
                     <img src="${book.cover || '/ITCS489/public/Images/books1.png'}" 
                          alt="${book.title}" 
@@ -191,7 +192,123 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Search parameters:', searchParams);
         const books = await fetchBooks(searchParams);
         displayBooks(books);
+    }    // Function to show notification
+    function showNotification(response, isSuccess = true) {
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.3s ease-in-out';
+
+        // Create notification
+        const notification = document.createElement('div');
+        // Handle both string messages and JSON responses
+        let message = typeof response === 'string' ? response : 
+                     response.message ? response.message :
+                     response.success ? 'Operation successful' : 
+                     response.error || 'Unknown error occurred';
+        
+        notification.className = `bg-white rounded-lg shadow-2xl p-6 max-w-md w-full mx-4 transform scale-95 opacity-0 transition-all duration-300`;
+        notification.innerHTML = `
+            <div class="text-center mb-4">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full ${isSuccess ? 'bg-green-100' : 'bg-red-100'} mb-4">
+                    <i class="fas ${isSuccess ? 'fa-check' : 'fa-exclamation'} text-2xl ${isSuccess ? 'text-green-500' : 'text-red-500'}"></i>
+                </div>
+                <h3 class="text-lg font-semibold ${isSuccess ? 'text-green-800' : 'text-red-800'} mb-2">${isSuccess ? 'Success!' : 'Error'}</h3>
+                <p class="text-gray-600">${message}</p>
+            </div>
+            <div class="flex justify-center">
+                <button class="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors">
+                    Close
+                </button>
+            </div>
+        `;        overlay.appendChild(notification);
+        document.body.appendChild(overlay);
+
+        // Animate in
+        requestAnimationFrame(() => {
+            overlay.style.opacity = '1';
+            notification.style.transform = 'scale(1)';
+            notification.style.opacity = '1';
+        });
+
+        // Add click handlers
+        const closeNotification = () => {
+            overlay.style.opacity = '0';
+            notification.style.transform = 'scale(0.95)';
+            notification.style.opacity = '0';
+            setTimeout(() => overlay.remove(), 300);
+        };
+
+        notification.querySelector('button').addEventListener('click', closeNotification);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                closeNotification();
+            }
+        });
+
+        // Auto dismiss after 3 seconds
+        setTimeout(closeNotification, 3000);
     }
+
+    // Function to update cart count
+    async function updateCartCount() {
+        try {
+            const response = await fetch('/ITCS489/public/index.php?route=order/count');
+            const data = await response.json();
+            const cartCount = document.getElementById('cart-count');
+            if (cartCount) {
+                cartCount.textContent = data.count || '0';
+            }
+        } catch (error) {
+            console.error('Error updating cart count:', error);
+        }
+    }
+
+    // Add to cart functionality
+    if (resultsContainer) {
+        resultsContainer.addEventListener('click', async function(e) {
+            if (e.target.classList.contains('add-to-cart')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const bookId = e.target.dataset.id;
+                if (!bookId) return;                try {
+                    const response = await fetch('/ITCS489/public/index.php?route=order/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `book_id=${bookId}&quantity=1`
+                    });
+
+                    const data = await response.json();
+                    showNotification(data, data.success);
+                    if (data.success) {
+                        updateCartCount();
+                    }
+                } catch (error) {
+                    console.error('Error adding to cart:', error);
+                    showNotification('Failed to add book to cart', false);
+                }
+            }
+        });
+    }
+
+    // Add click event for book details
+    if (resultsContainer) {
+        resultsContainer.addEventListener('click', function(e) {
+            const bookCard = e.target.closest('.book-card');
+            if (bookCard && !e.target.classList.contains('add-to-cart')) {
+                const bookId = bookCard.dataset.id;
+                if (bookId) {
+                    window.location.href = `/ITCS489/public/index.php?route=book/show&id=${bookId}`;
+                }
+            }
+        });
+    }
+
+    // Initial cart count update
+    updateCartCount();
 
     // Event listeners
     if (searchBtn) {

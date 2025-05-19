@@ -69,7 +69,7 @@ if (!isset($book) || !is_array($book)) {
                             <div class="text-red-600"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
                         <?php endif; ?>
 
-                        <form action="index.php?route=order/add" method="POST" class="flex items-center space-x-2">
+                        <form id="addToCartForm" action="index.php?route=order/add" method="POST" class="flex items-center space-x-2">
                             <input type="hidden" name="book_id" value="<?php echo $book['id']; ?>">
                             <div class="flex border rounded-md">
                                 <button type="button" class="px-3 py-1 bg-gray-200 text-gray-600" onclick="updateQuantity(-1)">-</button>
@@ -197,16 +197,79 @@ if (!isset($book) || !is_array($book)) {
         <?php endif; ?>
     </div>
 
-    <!-- Footer would be included here -->
-
-    <script>
+    <!-- Footer would be included here -->    <script>
         // Quantity control
         function updateQuantity(change) {
             const quantityInput = document.getElementById('quantity');
             let newValue = parseInt(quantityInput.value) + change;
-            newValue = Math.max(1, Math.min(10, newValue));
+            newValue = Math.max(1, Math.min(99, newValue));
             quantityInput.value = newValue;
         }
+
+        // Notification function
+        function showNotification(message, success = true) {
+            let notification = document.getElementById('notification');
+            if (!notification) {
+                notification = document.createElement('div');
+                notification.id = 'notification';
+                document.body.appendChild(notification);
+            }
+
+            notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded shadow-lg transition-all duration-300 transform translate-y-0 
+                                    ${success ? 'bg-green-500' : 'bg-red-500'} text-white flex items-center space-x-2`;
+            notification.innerHTML = `
+                <i class="fas ${success ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+                <button class="ml-4" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+            setTimeout(() => {
+                notification.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Cart count update
+        async function updateCartCount() {
+            try {
+                const response = await fetch('/ITCS489/public/index.php?route=order/count');
+                const data = await response.json();
+                const cartCount = document.getElementById('cart-count');
+                if (cartCount) {
+                    cartCount.textContent = data.count || '0';
+                }
+            } catch (error) {
+                console.error('Error updating cart count:', error);
+            }
+        }
+
+        // Form submission
+        document.getElementById('addToCartForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const formData = new FormData(this);
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                showNotification(data.message, data.success);
+                
+                if (data.success) {
+                    updateCartCount();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Failed to add book to cart', false);
+            }
+        });
 
         // Tab switching
         document.querySelectorAll('.tab-button').forEach(button => {
@@ -231,10 +294,7 @@ if (!isset($book) || !is_array($book)) {
                     document.getElementById('reviewsContent').classList.remove('hidden');
                 }
             });
-        });        // Removed cart functionality as we're using orders instead
-
-        // If the book has multiple images, we would load them here
-        // This is just a placeholder for that functionality
+        });
         function loadAdditionalImages() {
             // In a real implementation, this would fetch additional images from the server
             /*

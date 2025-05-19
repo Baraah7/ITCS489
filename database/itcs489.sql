@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 18, 2025 at 12:18 AM
+-- Generation Time: May 18, 2025 at 03:54 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -37,37 +37,41 @@ CREATE TABLE `books` (
   `stock` int(11) DEFAULT 0,
   `cover_image` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `category_id` int(11) DEFAULT NULL
+  `category_id` int(11) DEFAULT NULL,
+  `isbn` varchar(20) DEFAULT NULL,
+  `page_count` int(11) DEFAULT NULL,
+  `publisher` varchar(255) DEFAULT NULL,
+  `publication_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `books`
 --
 
-INSERT INTO `books` (`id`, `title`, `author`, `description`, `price`, `rating`, `stock`, `cover_image`, `created_at`, `category_id`) VALUES
-(1, 'The Great Gatsby', 'F. Scott Fitzgerald', 'A novel set in the Roaring Twenties.', 10.99, 0.0, 12, 'gatsby.jpg', '2025-05-17 09:54:01', 2),
-(2, '1984', 'George Orwell', 'Dystopian novel about totalitarian regime.', 9.50, 0.0, 20, '1984.jpg', '2025-05-17 09:54:01', 3),
-(3, 'To Kill a Mockingbird', 'Harper Lee', 'Classic novel of racism and justice.', 11.25, 0.0, 15, 'mockingbird.jpg', '2025-05-17 09:54:01', 2),
-(4, 'The Great Gatsby', 'F. Scott Fitzgerald', 'A novel set in the Roaring Twenties.', 10.99, 0.0, 12, 'gatsby.jpg', '2025-05-17 09:54:35', NULL),
-(5, '1984', 'George Orwell', 'Dystopian novel about totalitarian regime.', 9.50, 0.0, 20, '1984.jpg', '2025-05-17 09:54:35', NULL),
-(6, 'To Kill a Mockingbird', 'Harper Lee', 'Classic novel of racism and justice.', 11.25, 0.0, 15, 'mockingbird.jpg', '2025-05-17 09:54:35', NULL),
-(7, 'The Great Gatsby', 'F. Scott Fitzgerald', 'A novel set in the Roaring Twenties.', 10.99, 0.0, 12, 'gatsby.jpg', '2025-05-17 09:54:45', NULL),
-(8, '1984', 'George Orwell', 'Dystopian novel about totalitarian regime.', 9.50, 0.0, 20, '1984.jpg', '2025-05-17 09:54:45', NULL),
-(9, 'To Kill a Mockingbird', 'Harper Lee', 'Classic novel of racism and justice.', 11.25, 0.0, 15, 'mockingbird.jpg', '2025-05-17 09:54:45', NULL),
-(10, 'Harry Potter and the Cursed Child', 'J.K. Rowling', 'Return to the Wizarding World in this two-part stage play.', 14.99, 0.0, 25, 'books1.png', '2025-05-17 15:42:25', 1),
-(11, 'The Great Gatsby', 'F. Scott Fitzgerald', 'A story of decadence and excess.', 12.99, 0.0, 30, 'book 3.bmp', '2025-05-17 15:42:25', 2),
-(12, '1984', 'George Orwell', 'A dystopian social science fiction novel.', 11.99, 0.0, 20, 'book 4.bmp', '2025-05-17 15:42:25', 3),
-(13, 'Autism Empowerment for Adults', 'Jules Golden', 'Practical strategies for neurodiverse adults.', 19.99, 0.0, 15, 'book 5.bmp', '2025-05-17 15:42:25', NULL),
-(14, 'The Power of Habit', 'Charles Duhigg', 'Why we do what we do in life and business.', 16.99, 0.0, 25, 'book 6.bmp', '2025-05-17 15:42:25', NULL),
-(15, 'Atomic Habits', 'James Clear', 'An easy and proven way to build good habits.', 15.99, 0.0, 30, 'book 7.bmp', '2025-05-17 15:42:25', NULL),
-(16, 'The Silent Patient', 'Alex Michaelides', 'A psychological thriller about a woman who shoots her husband and then stops speaking.', 12.99, 4.5, 100, 'book1.jpg', '2025-05-17 17:55:50', 65),
-(17, 'Educated', 'Tara Westover', 'A memoir about a woman who leaves her survivalist family and goes on to earn a PhD from Cambridge University.', 14.95, 4.7, 85, 'book2.jpg', '2025-05-17 17:55:50', 4),
-(18, 'Dune', 'Frank Herbert', 'A science fiction novel about a desert planet and the boy who would become its messiah.', 9.99, 4.8, 120, 'book3.jpg', '2025-05-17 17:55:50', 3),
-(19, 'The Midnight Library', 'Matt Haig', 'A novel about a library between life and death where each book represents a different life path.', 13.49, 4.2, 95, 'book4.jpg', '2025-05-17 17:55:50', 1),
-(20, 'Atomic Habits', 'James Clear', 'A guide to building good habits and breaking bad ones with tiny changes.', 11.98, 4.6, 150, 'book5.jpg', '2025-05-17 17:55:50', 67),
-(21, 'The Hobbit', 'J.R.R. Tolkien', 'A fantasy novel about a hobbit who goes on an adventure with a group of dwarves.', 8.99, 4.9, 200, 'book6.jpg', '2025-05-17 17:55:50', 64),
-(22, 'Where the Crawdads Sing', 'Delia Owens', 'A novel about a girl who raises herself in the marshes of North Carolina.', 10.49, 4.8, 110, 'book7.jpg', '2025-05-17 17:55:50', 1),
-(23, 'The Song of Achilles', 'Madeline Miller', 'A retelling of the Iliad from the perspective of Patroclus, Achilles\' lover.', 12.99, 4.6, 75, 'book8.jpg', '2025-05-17 17:55:50', 66);
+INSERT INTO `books` (`id`, `title`, `author`, `description`, `price`, `rating`, `stock`, `cover_image`, `created_at`, `category_id`, `isbn`, `page_count`, `publisher`, `publication_date`) VALUES
+(1, 'The Great Gatsby', 'F. Scott Fitzgerald', 'A novel set in the Roaring Twenties.', 10.99, 0.0, 12, 'gatsby.jpg', '2025-05-17 09:54:01', 2, '9780743273565', 180, 'Charles Scribner\'s Sons', '1925-04-10'),
+(2, '1984', 'George Orwell', 'Dystopian novel about totalitarian regime.', 9.50, 0.0, 20, '1984.jpg', '2025-05-17 09:54:01', 3, '9780451524935', 328, 'Secker & Warburg', '1949-06-08'),
+(3, 'To Kill a Mockingbird', 'Harper Lee', 'Classic novel of racism and justice.', 11.25, 0.0, 15, 'mockingbird.jpg', '2025-05-17 09:54:01', 2, '9780061120084', 281, 'J.B. Lippincott & Co.', '1960-07-11'),
+(4, 'The Great Gatsby', 'F. Scott Fitzgerald', 'A novel set in the Roaring Twenties.', 10.99, 0.0, 12, 'gatsby.jpg', '2025-05-17 09:54:35', NULL, NULL, NULL, NULL, NULL),
+(5, '1984', 'George Orwell', 'Dystopian novel about totalitarian regime.', 9.50, 0.0, 20, '1984.jpg', '2025-05-17 09:54:35', NULL, NULL, NULL, NULL, NULL),
+(6, 'To Kill a Mockingbird', 'Harper Lee', 'Classic novel of racism and justice.', 11.25, 0.0, 15, 'mockingbird.jpg', '2025-05-17 09:54:35', NULL, NULL, NULL, NULL, NULL),
+(7, 'The Great Gatsby', 'F. Scott Fitzgerald', 'A novel set in the Roaring Twenties.', 10.99, 0.0, 12, 'gatsby.jpg', '2025-05-17 09:54:45', NULL, NULL, NULL, NULL, NULL),
+(8, '1984', 'George Orwell', 'Dystopian novel about totalitarian regime.', 9.50, 0.0, 20, '1984.jpg', '2025-05-17 09:54:45', NULL, NULL, NULL, NULL, NULL),
+(9, 'To Kill a Mockingbird', 'Harper Lee', 'Classic novel of racism and justice.', 11.25, 0.0, 15, 'mockingbird.jpg', '2025-05-17 09:54:45', NULL, NULL, NULL, NULL, NULL),
+(10, 'Harry Potter and the Cursed Child', 'J.K. Rowling', 'Return to the Wizarding World in this two-part stage play.', 14.99, 0.0, 25, 'books1.png', '2025-05-17 15:42:25', 1, '9781408855652', 343, 'Little, Brown', '2016-07-31'),
+(11, 'The Great Gatsby', 'F. Scott Fitzgerald', 'A story of decadence and excess.', 12.99, 0.0, 30, 'book 3.bmp', '2025-05-17 15:42:25', 2, '9780140283334', 224, 'Penguin Books', '2000-01-01'),
+(12, '1984', 'George Orwell', 'A dystopian social science fiction novel.', 11.99, 0.0, 20, 'book 4.bmp', '2025-05-17 15:42:25', 3, '9780141036144', 328, 'Penguin Books', '2003-01-01'),
+(13, 'Autism Empowerment for Adults', 'Jules Golden', 'Practical strategies for neurodiverse adults.', 19.99, 0.0, 15, 'book 5.bmp', '2025-05-17 15:42:25', NULL, '9780997155702', 300, 'Autism Empowerment Press', '2017-10-01'),
+(14, 'The Power of Habit', 'Charles Duhigg', 'Why we do what we do in life and business.', 16.99, 0.0, 25, 'book 6.bmp', '2025-05-17 15:42:25', NULL, '9780812981605', 416, 'Random House', '2012-02-28'),
+(15, 'Atomic Habits', 'James Clear', 'An easy and proven way to build good habits.', 15.99, 0.0, 30, 'book 7.bmp', '2025-05-17 15:42:25', NULL, '9780735211292', 320, 'Avery', '2018-10-16'),
+(16, 'The Silent Patient', 'Alex Michaelides', 'A psychological thriller about a woman who shoots her husband and then stops speaking.', 12.99, 4.5, 100, 'book1.jpg', '2025-05-17 17:55:50', 65, '9781250301697', 336, NULL, NULL),
+(17, 'Educated', 'Tara Westover', 'A memoir about a woman who leaves her survivalist family and goes on to earn a PhD from Cambridge University.', 14.95, 4.7, 85, 'book2.jpg', '2025-05-17 17:55:50', 4, '9780399590504', 400, NULL, NULL),
+(18, 'Dune', 'Frank Herbert', 'A science fiction novel about a desert planet and the boy who would become its messiah.', 9.99, 4.8, 120, 'book3.jpg', '2025-05-17 17:55:50', 3, '9780441013593', 688, NULL, NULL),
+(19, 'The Midnight Library', 'Matt Haig', 'A novel about a library between life and death where each book represents a different life path.', 13.49, 4.2, 95, 'book4.jpg', '2025-05-17 17:55:50', 1, '9780525559474', 304, NULL, NULL),
+(20, 'Atomic Habits', 'James Clear', 'A guide to building good habits and breaking bad ones with tiny changes.', 11.98, 4.6, 150, 'book5.jpg', '2025-05-17 17:55:50', 67, '9780735211292', 320, NULL, NULL),
+(21, 'The Hobbit', 'J.R.R. Tolkien', 'A fantasy novel about a hobbit who goes on an adventure with a group of dwarves.', 8.99, 4.9, 200, 'book6.jpg', '2025-05-17 17:55:50', 64, '9780547928227', 310, NULL, NULL),
+(22, 'Where the Crawdads Sing', 'Delia Owens', 'A novel about a girl who raises herself in the marshes of North Carolina.', 10.49, 4.8, 110, 'book7.jpg', '2025-05-17 17:55:50', 1, '9780735219106', 384, NULL, NULL),
+(23, 'The Song of Achilles', 'Madeline Miller', 'A retelling of the Iliad from the perspective of Patroclus, Achilles\' lover.', 12.99, 4.6, 75, 'book8.jpg', '2025-05-17 17:55:50', 66, '9780062060624', 378, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -79,28 +83,6 @@ CREATE TABLE `book_categories` (
   `book_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `cart_items`
---
-
-CREATE TABLE `cart_items` (
-  `id` int(11) NOT NULL,
-  `session_id` varchar(255) NOT NULL,
-  `book_id` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL DEFAULT 1,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `cart_items`
---
-
-INSERT INTO `cart_items` (`id`, `session_id`, `book_id`, `quantity`, `created_at`) VALUES
-(1, '7s01up3j0dm1bmevacfgabp9jl', 2, 1, '2025-05-17 21:53:55'),
-(2, '7s01up3j0dm1bmevacfgabp9jl', 3, 1, '2025-05-17 21:54:10');
 
 -- --------------------------------------------------------
 
@@ -228,14 +210,6 @@ ALTER TABLE `book_categories`
   ADD KEY `category_id` (`category_id`);
 
 --
--- Indexes for table `cart_items`
---
-ALTER TABLE `cart_items`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `book_id` (`book_id`),
-  ADD KEY `session_id` (`session_id`);
-
---
 -- Indexes for table `categories`
 --
 ALTER TABLE `categories`
@@ -273,12 +247,6 @@ ALTER TABLE `users`
 --
 ALTER TABLE `books`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
-
---
--- AUTO_INCREMENT for table `cart_items`
---
-ALTER TABLE `cart_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -320,12 +288,6 @@ ALTER TABLE `books`
 ALTER TABLE `book_categories`
   ADD CONSTRAINT `book_categories_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`),
   ADD CONSTRAINT `book_categories_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`);
-
---
--- Constraints for table `cart_items`
---
-ALTER TABLE `cart_items`
-  ADD CONSTRAINT `cart_items_book_fk` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `orders`
