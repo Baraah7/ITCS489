@@ -72,27 +72,21 @@ class OrderController {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+
+        // Always send JSON response for this endpoint
+        header('Content-Type: application/json; charset=UTF-8');
         
         // Get book_id and quantity from POST data
         $book_id = $_POST['book_id'] ?? null;
         $quantity = intval($_POST['quantity'] ?? 1);
-        
-        // Check if this is an AJAX request
-        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
+        // Validate input
         if (!$book_id || $quantity < 1) {
-            if ($isAjax) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Invalid book or quantity'
-                ]);
-                exit;
-            } else {
-                $_SESSION['error'] = 'Invalid book or quantity';
-                header('Location: ' . $_SERVER['HTTP_REFERER'] ?? '/ITCS489/public/index.php');
-                exit;
-            }
+            echo json_encode([
+                'success' => false,
+                'message' => 'Invalid book or quantity'
+            ]);
+            exit;
         }
 
         try {
@@ -120,19 +114,13 @@ class OrderController {
                     $stmt = $this->db->prepare("SELECT title, price, cover_image FROM books WHERE id = ?");
                     $stmt->execute([$book_id]);
                     $book = $stmt->fetch(PDO::FETCH_ASSOC);
-
+                    
                     if (!$book) {
-                        if ($isAjax) {
-                            echo json_encode([
-                                'success' => false,
-                                'message' => 'Book not found'
-                            ]);
-                            exit;
-                        } else {
-                            $_SESSION['error'] = 'Book not found';
-                            header('Location: ' . $_SERVER['HTTP_REFERER'] ?? '/ITCS489/public/index.php');
-                            exit;
-                        }
+                        echo json_encode([
+                            'success' => false,
+                            'message' => 'Book not found'
+                        ]);
+                        exit;
                     }
 
                     $_SESSION['guest_order']['items'][] = [
@@ -180,27 +168,19 @@ class OrderController {
                 }
             }
 
-            if ($isAjax) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Book added to cart successfully',
-                    'count' => $cartCount
-                ]);
-            } else {
-                $_SESSION['success'] = 'Book added to cart successfully';
-                header('Location: ' . $_SERVER['HTTP_REFERER'] ?? '/ITCS489/public/index.php');
-            }
+            // Always return JSON response
+            echo json_encode([
+                'success' => true,
+                'message' => 'Book added to cart successfully',
+                'count' => $cartCount
+            ]);
             
         } catch (Exception $e) {
-            if ($isAjax) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Error adding book to cart: ' . $e->getMessage()
-                ]);
-            } else {
-                $_SESSION['error'] = 'Error adding book to cart: ' . $e->getMessage();
-                header('Location: ' . $_SERVER['HTTP_REFERER'] ?? '/ITCS489/public/index.php');
-            }
+            error_log('Error adding book to cart: ' . $e->getMessage());
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error adding book to cart: ' . $e->getMessage()
+            ]);
         }
         exit;
     }
@@ -528,7 +508,8 @@ class OrderController {
             session_start();
         }
 
-        header('Content-Type: application/json');
+        header('Content-Type: application/json; charset=UTF-8');
+        header('X-Content-Type-Options: nosniff');
 
         $count = 0;
         
@@ -551,6 +532,12 @@ class OrderController {
                 }
             } catch (Exception $e) {
                 error_log("Error getting cart count: " . $e->getMessage());
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Error retrieving cart count',
+                    'count' => 0
+                ]);
+                exit;
             }
         }
 

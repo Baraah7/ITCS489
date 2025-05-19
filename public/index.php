@@ -37,7 +37,9 @@ switch ($route) {
 
     case 'order/count':
         $orderController->getCartCount();
-        break;    case 'order/add':
+        break;    // Both routes supported for backward compatibility
+    case 'order/add':
+    case 'order/addToOrder':
         $orderController->addToOrder();
         break;
 

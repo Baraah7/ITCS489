@@ -257,7 +257,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to update cart count
     async function updateCartCount() {
         try {
-            const response = await fetch('/ITCS489/public/index.php?route=order/count');
+            const response = await fetch('/ITCS489/public/index.php?route=order/count', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            let contentType = response.headers.get("content-type");
+            if (!contentType) {
+                throw new TypeError("No content type header received");
+            }
+            contentType = contentType.toLowerCase();
+            if (!contentType.includes("application/json")) {
+                console.error("Unexpected content type:", contentType);
+                throw new TypeError("Server sent an invalid response format");
+            }
+
             const data = await response.json();
             const cartCount = document.getElementById('cart-count');
             if (cartCount) {
@@ -265,6 +285,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Error updating cart count:', error);
+            // Don't show error to user since this is a background operation
+            const cartCount = document.getElementById('cart-count');
+            if (cartCount) {
+                cartCount.textContent = '0';
+            }
         }
     }
 
@@ -275,23 +300,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 e.stopPropagation();
                 const bookId = e.target.dataset.id;
-                if (!bookId) return;                try {
+                if (!bookId) return;
+
+                try {
                     const response = await fetch('/ITCS489/public/index.php?route=order/add', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         },
                         body: `book_id=${bookId}&quantity=1`
                     });
 
+                    if (!response.ok) {
+                        try {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                        } catch (e) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                    }
+
+                    let contentType = response.headers.get("content-type");
+                    if (!contentType) {
+                        throw new TypeError("No content type header received");
+                    }
+                    contentType = contentType.toLowerCase();
+                    if (!contentType.includes("application/json")) {
+                        console.error("Unexpected content type:", contentType);
+                        throw new TypeError("Server sent an invalid response format");
+                    }
+
                     const data = await response.json();
-                    showNotification(data, data.success);
+                    showNotification(data.message || 'Book added to cart successfully', data.success ? 'success' : 'error');
                     if (data.success) {
-                        updateCartCount();
+                        await updateCartCount();
                     }
                 } catch (error) {
                     console.error('Error adding to cart:', error);
-                    showNotification('Failed to add book to cart', false);
+                    showNotification(error.message || 'Failed to add book to cart. Please try again.', 'error');
                 }
             }
         });
