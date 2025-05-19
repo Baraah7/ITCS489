@@ -3,25 +3,42 @@ console.log('Search script loaded!');
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM Content loaded!');
-    // DOM Elements
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-    const categoryFilter = document.getElementById('category-filter');
-    const authorFilter = document.getElementById('author-filter');
-    const minPrice = document.getElementById('min-price');
-    const maxPrice = document.getElementById('max-price');
-    const yearFilter = document.getElementById('year-filter');
-    const sortBy = document.getElementById('sort-by');
-    const resultsContainer = document.getElementById('results-container');
-    const pagination = document.getElementById('pagination');
-    const prevPageBtn = document.getElementById('prev-page');
-    const nextPageBtn = document.getElementById('next-page');
-    const pageNumbers = document.getElementById('page-numbers');
-    const advancedSearchToggle = document.getElementById('advanced-search-toggle');
-    const advancedSearch = document.getElementById('advanced-search');
+    
+    // Only initialize search functionality if we're on the search page
+    const isSearchPage = document.getElementById('search-page');
+    
+    // These are elements used in multiple pages
+    const cartCount = document.getElementById('cart-count');
+
+    // Search page specific elements
+    let searchInput, searchBtn, categoryFilter, authorFilter, minPrice, maxPrice;
+    let yearFilter, sortBy, resultsContainer, pagination, prevPageBtn, nextPageBtn;
+    let pageNumbers, advancedSearchToggle, advancedSearch;
+    
+    if (isSearchPage) {
+        searchInput = document.getElementById('search-input');
+        searchBtn = document.getElementById('search-btn');
+        categoryFilter = document.getElementById('category-filter');
+        authorFilter = document.getElementById('author-filter');
+        minPrice = document.getElementById('min-price');
+        maxPrice = document.getElementById('max-price');
+        yearFilter = document.getElementById('year-filter');
+        sortBy = document.getElementById('sort-by');
+        resultsContainer = document.getElementById('results-container');
+        pagination = document.getElementById('pagination');
+        prevPageBtn = document.getElementById('prev-page');
+        nextPageBtn = document.getElementById('next-page');
+        pageNumbers = document.getElementById('page-numbers');
+        advancedSearchToggle = document.getElementById('advanced-search-toggle');
+        advancedSearch = document.getElementById('advanced-search');
+    }    // Initialize shared functionality
+    updateCartCount(); // This will work on any page
+
+    // Only proceed with search functionality if we're on the search page
+    if (!isSearchPage) return;
 
     // Debug log DOM elements
-    console.log('DOM Elements found:', {
+    console.log('Search page elements found:', {
         searchInput: !!searchInput,
         searchBtn: !!searchBtn,
         categoryFilter: !!categoryFilter,

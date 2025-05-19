@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Haven - Search Books</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Book Haven - Search Books</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Add defer to ensure DOM is loaded before script runs -->
     <script src="/ITCS489/public/js/search.js" defer></script>
 </head>
-<body class="min-h-screen" style="background-color: #FFF9F4">
+<body id="search-page" class="min-h-screen" style="background-color: #FFF9F4">
     <!-- Navigation -->
     <nav style="background-color: #2A3F5F" class="text-white shadow-lg">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
